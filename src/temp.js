@@ -4,8 +4,8 @@ import './App.css';
 function App() {
    // Global variables
    const urlGetDeck = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
-   const urlDrawHand = "https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=7";
-   const urlCombo = "https://deckofcardsapi.com/api/deck/new/draw/?count=7";
+   const urlDrawHand = "https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=18";
+   const urlCombo = "https://deckofcardsapi.com/api/deck/new/draw/?count=18";
    
    // Temporary variables
    // const deckId = "kgjfc7btniiv";
@@ -16,7 +16,7 @@ function App() {
     message: 'Draw card',
   });
   const [deckId, setDeckId] = useState("");
-  const [hand, setHand] = useState();
+  const [hand, setHand] = useState([]);
 
   // Reset game
   const onReset = useCallback(() => {
@@ -73,8 +73,8 @@ function App() {
      fetch(urlCombo)
        .then((response) => response.json())
        .then((data) => {
-          let workHand = [];
-          let handEntry = {};  
+          let workHand = hand;
+          let handEntry;
           let sortKey = 0;
           //  load player's hand
           let i = 0;
@@ -96,10 +96,10 @@ function App() {
             };
             workHand.push(handEntry);
           }
-          console.log('workHand:',workHand);
-          workHand.sort((a, b) => a.sortKey - b.sortKey);
+          console.log(workHand);
+          console.log('workHand length',workHand);
           setHand(workHand);
-          setDeckId(data.deck_id);
+          setDeckId(data.deck_id); 
        })
    }, []);
 
@@ -185,7 +185,7 @@ function App() {
           <img className="img-card" src={hand[3].cardImage} alt="" />
           <img className="img-card" src={hand[4].cardImage} alt="" />
           <img className="img-card" src={hand[5].cardImage} alt="" />
-          <img className="img-card" src={hand[6].cardImage} alt="" />  
+          <img className="img-card" src={hand[6].cardImage} alt="" />   
         </div>
       </div>
     </div>
