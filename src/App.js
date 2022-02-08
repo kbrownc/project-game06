@@ -3,9 +3,8 @@ import './App.css';
 
 function App() {
    // Global variables
-   const urlGetDeck = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
    const urlDrawHand = "https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=7";
-   const urlCombo = "https://deckofcardsapi.com/api/deck/new/draw/?count=7";
+   const urlGetDraw = "https://deckofcardsapi.com/api/deck/new/draw/?count=7";
    
    // Temporary variables
    // const deckId = "kgjfc7btniiv";
@@ -70,7 +69,7 @@ function App() {
 
   // useEffect - Get 18 cards from deck
    useEffect( () => {
-     fetch(urlCombo)
+     fetch(urlGetDraw)
        .then((response) => response.json())
        .then((data) => {
           let workHand = [];
@@ -100,9 +99,11 @@ function App() {
           workHand.sort((a, b) => a.sortKey - b.sortKey);
           setHand(workHand);
           setDeckId(data.deck_id);
+          console.log('hand:',hand);
        })
    }, []);
 
+   if (hand === undefined) return null;
   return (
     <div className="Container">
       <div className="Nav">
@@ -120,7 +121,7 @@ function App() {
         </div>
       </div>
       <div className="Messages">
-        <h4>{message}</h4>
+        <span>{message}</span><br></br>
       </div>
       <div className="Nav-expand">
         <div className="Box-expand Button" style={{ gridColumn: 1, gridRow: 1 }} 
@@ -192,4 +193,4 @@ function App() {
   );
 };
 
-export default App; 
+export default App;  
