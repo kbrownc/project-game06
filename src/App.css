@@ -13,7 +13,7 @@
 }
 .Nav {
   display: grid;
-  grid-template-columns: repeat(4, 35px);
+  grid-template-columns: repeat(4, 95px);
   grid-template-rows: repeat(1, 20px);
   justify-content: center;
   align-items: center;
@@ -22,9 +22,10 @@
 .Messages {
   text-align: center;
   justify-content: center;
-  height: 60px;
-  width: 250px;
+  height: 30px;
+  width: 450px;
   margin: auto;
+  border: 1px solid black;
 }
 h4 {
   margin: 6px;
@@ -33,7 +34,7 @@ h4 {
   background-color: yellow;
   visibility: visible;
   border: 1px solid black;
-  width: 45px;
+  width: 90px;
   height: 20px;
   font-size: 12px;
   font-weight: bold;
