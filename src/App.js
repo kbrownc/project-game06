@@ -3,11 +3,8 @@ import './App.css';
 
 function App() {
    // Global variables
-   const urlDrawHand = "https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=7";
-   const urlGetDraw = "https://deckofcardsapi.com/api/deck/new/draw/?count=7";
-   
-   // Temporary variables
-   // const deckId = "kgjfc7btniiv";
+   const urlDrawHand = "https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=1";
+   const urlGetDraw = "https://deckofcardsapi.com/api/deck/new/draw/?count=18";
    // const urlDrawHand2 = urlDrawHand.replace("<<deck_id>>", deckId);
 
    // State
@@ -16,6 +13,7 @@ function App() {
   });
   const [deckId, setDeckId] = useState("");
   const [hand, setHand] = useState();
+  const [handPC, setHandPC] = useState();
 
   // Reset game
   const onReset = useCallback(() => {
@@ -73,11 +71,12 @@ function App() {
        .then((response) => response.json())
        .then((data) => {
           let workHand = [];
+          let workHandPC = [];
           let handEntry = {};  
           let sortKey = 0;
           //  load player's hand
           let i = 0;
-          for (i = 0; i < data.cards.length; i++) {
+          for (i = 0; i < 7; i++) {
             if (data.cards[i].value === 'KING') {
               sortKey = 13;
             } else if (data.cards[i].value === 'QUEEN') {
@@ -92,17 +91,25 @@ function App() {
             handEntry = {
               cardImage: data.cards[i].image,
               sortKey: sortKey,
+              code: data.cards[i].code,
             };
             workHand.push(handEntry);
           }
+          //  load PC's hand
+          for (i = 7; i < data.cards.length && i > 6; i++) {
+            workHandPC.push(data.cards[i].image);
+          }
           console.log('workHand:',workHand);
+          console.log('workHandPC:',workHandPC);
           workHand.sort((a, b) => a.sortKey - b.sortKey);
           setHand(workHand);
+          setHandPC(workHandPC);
           setDeckId(data.deck_id);
-          console.log('hand:',hand);
        })
    }, []);
 
+   // The following if statement is to stop an initial render error. 
+   //    UseEffect is executed after an initial render.
    if (hand === undefined) return null;
   return (
     <div className="Container">
@@ -180,13 +187,7 @@ function App() {
       <div  className="Hand">
         <div>
            <span>Your Hand</span><br></br>
-          <img className="img-card" src={hand[0].cardImage} alt="" />
-          <img className="img-card" src={hand[1].cardImage} alt="" />
-          <img className="img-card" src={hand[2].cardImage} alt="" />
-          <img className="img-card" src={hand[3].cardImage} alt="" />
-          <img className="img-card" src={hand[4].cardImage} alt="" />
-          <img className="img-card" src={hand[5].cardImage} alt="" />
-          <img className="img-card" src={hand[6].cardImage} alt="" />  
+          {hand.map(item => (<img key={item.code} className="img-card" src={item.cardImage} alt="" />))}
         </div>
       </div>
     </div>
