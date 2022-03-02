@@ -91,23 +91,25 @@ function App() {
         let workSide4 = [];
         let handEntry = {};
         let sortKey = 0;
+        let sortCard = 0;
         //  load player's hand
         let i = 0;
         for (i = 0; i < 7; i++) {
           if (data.cards[i].value === 'KING') {
-            sortKey = 13;
+            sortCard = 13;
           } else if (data.cards[i].value === 'QUEEN') {
-            sortKey = 12;
+            sortCard = 12;
           } else if (data.cards[i].value === 'JACK') {
-            sortKey = 11;
+            sortCard = 11;
           } else if (data.cards[i].value === 'ACE') {
-            sortKey = 1;
+            sortCard = 1;
           } else {
-            sortKey = Number(data.cards[i].value);
+            sortCard = Number(data.cards[i].value);
           }
           handEntry = {
             cardImage: data.cards[i].image,
             sortKey: i,
+            sortCard: sortCard,
             code: data.cards[i].code,
           };
           workHand.push(handEntry);
@@ -115,19 +117,20 @@ function App() {
         //  load other (PC's) hand
         for (i = 7; i < 14; i++) {
           if (data.cards[i].value === 'KING') {
-            sortKey = 13;
+            sortCard = 13;
           } else if (data.cards[i].value === 'QUEEN') {
-            sortKey = 12;
+            sortCard = 12;
           } else if (data.cards[i].value === 'JACK') {
-            sortKey = 11;
+            sortCard = 11;
           } else if (data.cards[i].value === 'ACE') {
-            sortKey = 1;
+            sortCard = 1;
           } else {
-            sortKey = Number(data.cards[i].value);
+            sortCard = Number(data.cards[i].value);
           }
           handEntry = {
             cardImage: data.cards[i].image,
-            sortKey: i,
+            sortKey: i + 100,
+            sortCard: sortCard,
             code: data.cards[i].code,
           };
           workHandPC.push(handEntry);
@@ -138,8 +141,6 @@ function App() {
         workSide3.push(data.cards[16].image);
         workSide4.push(data.cards[17].image);
 
-        workHand.sort((a, b) => a.sortKey - b.sortKey);
-        workHandPC.sort((a, b) => a.sortKey - b.sortKey);
         setHand(workHand);
         setHandPC(workHandPC);
         setSidePiles(() => {
@@ -154,130 +155,120 @@ function App() {
       });
   }, []);
 
-  // To support Context functionality
+  // To support DragDropContext functionality
   const onDragEnd = result => {};
 
-  // The following if statement is to stop an initial render error.
+  // The following 'if' statement is to stop an initial render error.
   //    UseEffect is executed after an initial render.
   if (hand === undefined || handPC === undefined) return null;
   return (
     <div className="Container">
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="KINGC">
+        <div className="Nav">
+          <div className="Box Button" style={{ gridColumn: 1, gridRow: 1 }} onClick={onReset}>
+            Reset Game
+          </div>
+          <div className="Box Button" style={{ gridColumn: 2, gridRow: 1 }} onClick={onDraw}>
+            Draw Card
+          </div>
+          <div className="Box Button" style={{ gridColumn: 3, gridRow: 1 }} onClick={onTurn}>
+            Turn Complete
+          </div>
+          <div className="Box Button" style={{ gridColumn: 4, gridRow: 1 }} onClick={onAbout}>
+            About
+          </div>
+        </div>
+        <div className="Messages">
+          <span>{message}</span>
+          <br></br>
+        </div>
+        <div className="Nav-expand">
+          <div
+            className="Box-expand Button"
+            style={{ gridColumn: 1, gridRow: 1 }}
+            onClick={() => onExpand(1)}
+          >
+            Expand
+          </div>
+          <div
+            className="Box-expand Button"
+            style={{ gridColumn: 2, gridRow: 1 }}
+            onClick={() => onExpand(2)}
+          >
+            Expand
+          </div>
+          <div
+            className="Box-expand Button"
+            style={{ gridColumn: 3, gridRow: 1 }}
+            onClick={() => onExpand(3)}
+          >
+            Expand
+          </div>
+          <div
+            className="Box-expand Button"
+            style={{ gridColumn: 4, gridRow: 1 }}
+            onClick={() => onExpand(4)}
+          >
+            Expand
+          </div>
+        </div>
+        <div className="Side-section">
+          <div className="Side">
+            <span>Side 1</span>
+            <br></br>
+            <img className="img-card" src={side1[0]} alt="" />
+            <img className="img-card" src={side1[side1.length === 1 ? 1 : side1.length - 1]} alt="" />
+          </div>
+          <div className="Side">
+            <span>Side 2</span>
+            <br></br>
+            <img className="img-card" src={side2[0]} alt="" />
+            <img className="img-card" src={side2[side2.length === 1 ? 1 : side2.length - 1]} alt="" />
+          </div>
+          <div className="Side">
+            <span>Side 3</span>
+            <br></br>
+            <img className="img-card" src={side3[0]} alt="" />
+            <img className="img-card" src={side3[side3.length === 1 ? 1 : side3.length - 1]} alt="" />
+          </div>
+          <div className="Side">
+            <span>Side 4</span>
+            <br></br>
+            <img className="img-card" src={side4[0]} alt="" />
+            <img className="img-card" src={side4[side4.length === 1 ? 1 : side4.length - 1]} alt="" />
+          </div>
+        </div>
+        <div className="Corner-section">
+          <div className="Corner">
+            <span>Corner 1</span>
+            <br></br>
+            <img className="img-card" src={corner1[corner1.length - 1]} alt="" />
+          </div>
+          <div className="Corner">
+            <span>Corner 2</span>
+            <br></br>
+            <img className="img-card" src={corner2[corner2.length - 1]} alt="" />
+          </div>
+          <div className="Corner">
+            <span>Corner 3</span>
+            <br></br>
+            <img className="img-card" src={corner3[corner3.length - 1]} alt="" />
+          </div>
+          <div className="Corner">
+            <span>Corner 4</span>
+            <br></br>
+            <img className="img-card" src={corner4[corner4.length - 1]} alt="" />
+          </div>
+        </div>
+        <Droppable droppableId="KCHAND" direction="horizontal">
           {provided => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
-            
-              <div className="Nav">
-                <div className="Box Button" style={{ gridColumn: 1, gridRow: 1 }} onClick={onReset}>
-                  Reset Game
-                </div>
-                <div className="Box Button" style={{ gridColumn: 2, gridRow: 1 }} onClick={onDraw}>
-                  Draw Card
-                </div>
-                <div className="Box Button" style={{ gridColumn: 3, gridRow: 1 }} onClick={onTurn}>
-                  Turn Complete
-                </div>
-                <div className="Box Button" style={{ gridColumn: 4, gridRow: 1 }} onClick={onAbout}>
-                  About
-                </div>
-              </div>
-              <div className="Messages">
-                <span>{message}</span>
-                <br></br>
-              </div>
-              <div className="Nav-expand">
-                <div
-                  className="Box-expand Button"
-                  style={{ gridColumn: 1, gridRow: 1 }}
-                  onClick={() => onExpand(1)}
-                >
-                  Expand
-                </div>
-                <div
-                  className="Box-expand Button"
-                  style={{ gridColumn: 2, gridRow: 1 }}
-                  onClick={() => onExpand(2)}
-                >
-                  Expand
-                </div>
-                <div
-                  className="Box-expand Button"
-                  style={{ gridColumn: 3, gridRow: 1 }}
-                  onClick={() => onExpand(3)}
-                >
-                  Expand
-                </div>
-                <div
-                  className="Box-expand Button"
-                  style={{ gridColumn: 4, gridRow: 1 }}
-                  onClick={() => onExpand(4)}
-                >
-                  Expand
-                </div>
-              </div>
-              <div className="Side-section">
-                <div className="Side">
-                  <span>Side 1</span>
-                  <br></br>
-                  <img className="img-card" src={side1[0]} alt="" />
-                  <img className="img-card" src={side1[side1.length === 1 ? 1 : side1.length - 1]} alt="" />
-                </div>
-                <div className="Side">
-                  <span>Side 2</span>
-                  <br></br>
-                  <img className="img-card" src={side2[0]} alt="" />
-                  <img className="img-card" src={side2[side2.length === 1 ? 1 : side2.length - 1]} alt="" />
-                </div>
-                <div className="Side">
-                  <span>Side 3</span>
-                  <br></br>
-                  <img className="img-card" src={side3[0]} alt="" />
-                  <img className="img-card" src={side3[side3.length === 1 ? 1 : side3.length - 1]} alt="" />
-                </div>
-                <div className="Side">
-                  <span>Side 4</span>
-                  <br></br>
-                  <img className="img-card" src={side4[0]} alt="" />
-                  <img className="img-card" src={side4[side4.length === 1 ? 1 : side4.length - 1]} alt="" />
-                </div>
-              </div>
-              <div className="Corner-section">
-                <div className="Corner">
-                  <span>Corner 1</span>
-                  <br></br>
-                  <img className="img-card" src={corner1[corner1.length - 1]} alt="" />
-                </div>
-                <div className="Corner">
-                  <span>Corner 2</span>
-                  <br></br>
-                  <img className="img-card" src={corner2[corner2.length - 1]} alt="" />
-                </div>
-                <div className="Corner">
-                  <span>Corner 3</span>
-                  <br></br>
-                  <img className="img-card" src={corner3[corner3.length - 1]} alt="" />
-                </div>
-                <div className="Corner">
-                  <span>Corner 4</span>
-                  <br></br>
-                  <img className="img-card" src={corner4[corner4.length - 1]} alt="" />
-                </div>
-              </div>
               <div className="Hand">
                 <div>
                   <span>Your Hand</span>
                   <br></br>
-                  {hand.map(item => (
-                    <img key={item.code} className="img-card" src={item.cardImage} alt="" />
-                  ))}
-                </div>
-              </div>
-              <div className="Hand">
-                <div>
-                  <span>Computer Hand</span>
-                  <br></br>
-                  {handPC.map(item => (
-                    <Draggable draggableId={item.sortKey.toString()} index={item.position} key={item.sortKey}>
+                  {hand.map((item, index) => (
+                    <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
                         <img
                           className="img-card"
@@ -290,10 +281,36 @@ function App() {
                       )}
                     </Draggable>
                   ))}
+                  {provided.placeholder}
                 </div>
               </div>
-
-              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+        <Droppable droppableId="KCHANDPC" direction="horizontal">
+          {provided => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              <div className="Hand">
+                <div>
+                  <span>Computer Hand</span>
+                  <br></br>
+                  {handPC.map((item, index) => (
+                    <Draggable draggableId={item.code} index={index} key={item.code}>
+                      {provided => (
+                        <img
+                          className="img-card"
+                          src={item.cardImage}
+                          alt=""
+                          {...provided.draggableProps}
+                          ref={provided.innerRef}
+                          {...provided.dragHandleProps}
+                        />
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              </div>
             </div>
           )}
         </Droppable>
