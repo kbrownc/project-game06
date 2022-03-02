@@ -78,34 +78,40 @@ function App() {
     });
   }, []);
 
+  // Expand card pile
+  const calcSortCard = value => {
+    let sortCard = 0;
+    if (value === 'KING') {
+      sortCard = 13;
+    } else if (value === 'QUEEN') {
+      sortCard = 12;
+    } else if (value === 'JACK') {
+      sortCard = 11;
+    } else if (value === 'ACE') {
+      sortCard = 1;
+    } else {
+      sortCard = Number(value);
+    }
+    return sortCard;
+  };
+
   // useEffect - Get 18 cards from deck
   useEffect(() => {
     fetch(urlGetDraw)
       .then(response => response.json())
       .then(data => {
-        let workHand = [];
-        let workHandPC = [];
-        let workSide1 = [];
-        let workSide2 = [];
-        let workSide3 = [];
-        let workSide4 = [];
-        let handEntry = {};
-        let sortKey = 0;
-        let sortCard = 0;
-        //  load player's hand
+        let workHand = [],
+          workHandPC = [];
+        let workSide1 = [],
+          workSide2 = [],
+          workSide3 = [],
+          workSide4 = [];
+        let handEntry = {},
+          sortKey = 0,
+          sortCard = 0;
         let i = 0;
         for (i = 0; i < 7; i++) {
-          if (data.cards[i].value === 'KING') {
-            sortCard = 13;
-          } else if (data.cards[i].value === 'QUEEN') {
-            sortCard = 12;
-          } else if (data.cards[i].value === 'JACK') {
-            sortCard = 11;
-          } else if (data.cards[i].value === 'ACE') {
-            sortCard = 1;
-          } else {
-            sortCard = Number(data.cards[i].value);
-          }
+          sortCard = calcSortCard(data.cards[i].value);
           handEntry = {
             cardImage: data.cards[i].image,
             sortKey: i,
@@ -116,20 +122,10 @@ function App() {
         }
         //  load other (PC's) hand
         for (i = 7; i < 14; i++) {
-          if (data.cards[i].value === 'KING') {
-            sortCard = 13;
-          } else if (data.cards[i].value === 'QUEEN') {
-            sortCard = 12;
-          } else if (data.cards[i].value === 'JACK') {
-            sortCard = 11;
-          } else if (data.cards[i].value === 'ACE') {
-            sortCard = 1;
-          } else {
-            sortCard = Number(data.cards[i].value);
-          }
+          sortCard = calcSortCard(data.cards[i].value);
           handEntry = {
             cardImage: data.cards[i].image,
-            sortKey: i + 100,
+            sortKey: i,
             sortCard: sortCard,
             code: data.cards[i].code,
           };
@@ -155,12 +151,47 @@ function App() {
       });
   }, []);
 
-  // To support DragDropContext functionality
-  const onDragEnd = result => {};
+  // onDragEnd:
+  //      To support DragDropContext functionality
+  const onDragEnd = result => {
+    // store where the card was initially and where it was dropped
+    const { destination, source } = result;
+    // make sure there is a change (moved item outside of draggable context area)
+    if (!destination || !source) {
+      return;
+    }
+    // make sure there is a change (moved item and returned it to same place in the same column)
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+      return;
+    }
+    // handle moving cards within and between your hand and the PCs hand
+    let add;
+    let changedHand = hand;
+    let changedHandPC = handPC;
+    // Source Logic - remove card
+    if (source.droppableId === 'KCHAND') {
+      add = changedHand[source.index];
+      changedHand.splice(source.index, 1);
+    } else {
+      add = changedHandPC[source.index];
+      changedHandPC.splice(source.index, 1);
+    }
+
+    // Destination Logic
+    if (destination.droppableId === 'KCHAND') {
+      changedHand.splice(destination.index, 0, add);
+    } else {
+      changedHandPC.splice(destination.index, 0, add);
+    }
+    setHandPC(changedHandPC);
+    setHand(changedHand);
+  };
 
   // The following 'if' statement is to stop an initial render error.
   //    UseEffect is executed after an initial render.
   if (hand === undefined || handPC === undefined) return null;
+  //
+  // RETURN
   return (
     <div className="Container">
       <DragDropContext onDragEnd={onDragEnd}>
