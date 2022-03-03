@@ -168,7 +168,10 @@ function App() {
     let add;
     let changedHand = hand;
     let changedHandPC = handPC;
-    let changedCorner1 = corner1;
+    let changedCorner1 = corner1,
+      changedCorner2 = corner2,
+      changedCorner3 = corner3,
+      changedCorner4 = corner4;
     // Source Logic - remove card
     if (source.droppableId === 'KCHAND') {
       add = changedHand[source.index];
@@ -176,9 +179,18 @@ function App() {
     } else if (source.droppableId === 'KCHANDPC') {
       add = changedHandPC[source.index];
       changedHandPC.splice(source.index, 1);
-    } else {
+    } else if (source.droppableId === 'KCCORNER1') {
       add = changedCorner1[source.index];
       changedCorner1.splice(source.index, 1);
+    } else if (source.droppableId === 'KCCORNER2') {
+      add = changedCorner2[source.index];
+      changedCorner2.splice(source.index, 1);
+    } else if (source.droppableId === 'KCCORNER3') {
+      add = changedCorner3[source.index];
+      changedCorner3.splice(source.index, 1);
+    } else if (source.droppableId === 'KCCORNER4') {
+      add = changedCorner4[source.index];
+      changedCorner4.splice(source.index, 1);
     }
 
     // Destination Logic
@@ -186,17 +198,23 @@ function App() {
       changedHand.splice(destination.index, 0, add);
     } else if (destination.droppableId === 'KCHANDPC') {
       changedHandPC.splice(destination.index, 0, add);
-    } else {
-      changedCorner1.splice(destination.index, 0, add);
+    } else if (destination.droppableId === 'KCCORNER1') {
+      changedCorner1.splice(destination.index, 1, add);
+    } else if (destination.droppableId === 'KCCORNER2') {
+      changedCorner2.splice(destination.index, 1, add);
+    } else if (destination.droppableId === 'KCCORNER3') {
+      changedCorner3.splice(destination.index, 1, add);
+    } else if (destination.droppableId === 'KCCORNER4') {
+      changedCorner4.splice(destination.index, 1, add);
     }
     setHandPC(changedHandPC);
     setHand(changedHand);
     setCornerPiles(() => {
           return {
             corner1: changedCorner1,
-            corner2: [],
-            corner3: [],
-            corner4: [],
+            corner2: changedCorner2,
+            corner3: changedCorner3,
+            corner4: changedCorner4,
           };
         });
   };
@@ -285,7 +303,7 @@ function App() {
         </div>
 
         <div className="Corner-section">
-        <Droppable droppableId="KCORNER1" direction="horizontal">
+        <Droppable droppableId="KCCORNER1" direction="horizontal">
           {provided => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
               <div className="Corner">
@@ -310,22 +328,83 @@ function App() {
             </div>
           )}
         </Droppable>
+        <Droppable droppableId="KCCORNER2" direction="horizontal">
+          {provided => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              <div className="Corner">
+                  <span>Corner 2</span>
+                  <br></br>
+                  {corner2.map((item, index) => (
+                    <Draggable draggableId={item.code} index={index} key={item.code}>
+                      {provided => (
+                        <img
+                          className="img-card"
+                          src={item.cardImage}
+                          alt=""
+                          {...provided.draggableProps}
+                          ref={provided.innerRef}
+                          {...provided.dragHandleProps}
+                        />
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+              </div>
+            </div>
+          )}
+        </Droppable>
+        <Droppable droppableId="KCCORNER3" direction="horizontal">
+          {provided => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              <div className="Corner">
+                  <span>Corner 3</span>
+                  <br></br>
+                  {corner3.map((item, index) => (
+                    <Draggable draggableId={item.code} index={index} key={item.code}>
+                      {provided => (
+                        <img
+                          className="img-card"
+                          src={item.cardImage}
+                          alt=""
+                          {...provided.draggableProps}
+                          ref={provided.innerRef}
+                          {...provided.dragHandleProps}
+                        />
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+              </div>
+            </div>
+          )}
+        </Droppable>
+        <Droppable droppableId="KCCORNER4" direction="horizontal">
+          {provided => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              <div className="Corner">
+                  <span>Corner 4</span>
+                  <br></br>
+                  {corner4.map((item, index) => (
+                    <Draggable draggableId={item.code} index={index} key={item.code}>
+                      {provided => (
+                        <img
+                          className="img-card"
+                          src={item.cardImage}
+                          alt=""
+                          {...provided.draggableProps}
+                          ref={provided.innerRef}
+                          {...provided.dragHandleProps}
+                        />
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+              </div>
+            </div>
+          )}
+        </Droppable>
 
-          <div className="Corner">
-            <span>Corner 2</span>
-            <br></br>
-            <img className="img-card" src={corner2[corner2.length - 1]} alt="" />
-          </div>
-          <div className="Corner">
-            <span>Corner 3</span>
-            <br></br>
-            <img className="img-card" src={corner3[corner3.length - 1]} alt="" />
-          </div>
-          <div className="Corner">
-            <span>Corner 4</span>
-            <br></br>
-            <img className="img-card" src={corner4[corner4.length - 1]} alt="" />
-          </div>
+          
         </div>
         <Droppable droppableId="KCHAND" direction="horizontal">
           {provided => (
