@@ -164,27 +164,41 @@ function App() {
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }
-    // handle moving cards within and between your hand and the PCs hand
+    // moving cards within and between your hand and the PCs hand
     let add;
     let changedHand = hand;
     let changedHandPC = handPC;
+    let changedCorner1 = corner1;
     // Source Logic - remove card
     if (source.droppableId === 'KCHAND') {
       add = changedHand[source.index];
       changedHand.splice(source.index, 1);
-    } else {
+    } else if (source.droppableId === 'KCHANDPC') {
       add = changedHandPC[source.index];
       changedHandPC.splice(source.index, 1);
+    } else {
+      add = changedCorner1[source.index];
+      changedCorner1.splice(source.index, 1);
     }
 
     // Destination Logic
     if (destination.droppableId === 'KCHAND') {
       changedHand.splice(destination.index, 0, add);
-    } else {
+    } else if (destination.droppableId === 'KCHANDPC') {
       changedHandPC.splice(destination.index, 0, add);
+    } else {
+      changedCorner1.splice(destination.index, 0, add);
     }
     setHandPC(changedHandPC);
     setHand(changedHand);
+    setCornerPiles(() => {
+          return {
+            corner1: changedCorner1,
+            corner2: [],
+            corner3: [],
+            corner4: [],
+          };
+        });
   };
 
   // The following 'if' statement is to stop an initial render error.
@@ -269,12 +283,34 @@ function App() {
             <img className="img-card" src={side4[side4.length === 1 ? 1 : side4.length - 1]} alt="" />
           </div>
         </div>
+
         <div className="Corner-section">
-          <div className="Corner">
-            <span>Corner 1</span>
-            <br></br>
-            <img className="img-card" src={corner1[corner1.length - 1]} alt="" />
-          </div>
+        <Droppable droppableId="KCORNER1" direction="horizontal">
+          {provided => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              <div className="Corner">
+                  <span>Corner 1</span>
+                  <br></br>
+                  {corner1.map((item, index) => (
+                    <Draggable draggableId={item.code} index={index} key={item.code}>
+                      {provided => (
+                        <img
+                          className="img-card"
+                          src={item.cardImage}
+                          alt=""
+                          {...provided.draggableProps}
+                          ref={provided.innerRef}
+                          {...provided.dragHandleProps}
+                        />
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+              </div>
+            </div>
+          )}
+        </Droppable>
+
           <div className="Corner">
             <span>Corner 2</span>
             <br></br>
@@ -345,6 +381,7 @@ function App() {
             </div>
           )}
         </Droppable>
+
       </DragDropContext>
     </div>
   );
