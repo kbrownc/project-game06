@@ -132,7 +132,13 @@ function App() {
           workHandPC.push(handEntry);
         }
         //  load Side Pile's
-        workSide1.push(data.cards[14].image);
+        handEntry = {
+          cardImage: data.cards[i].image,
+          sortKey: 1,
+          sortCard: 1,
+          code: data.cards[i].code,
+        };
+        workSide1.push(handEntry);
         workSide2.push(data.cards[15].image);
         workSide3.push(data.cards[16].image);
         workSide4.push(data.cards[17].image);
@@ -147,6 +153,7 @@ function App() {
             side4: workSide4,
           };
         });
+        console.table(workSide1);
         setDeckId(data.deck_id);
       });
   }, []);
@@ -172,6 +179,10 @@ function App() {
       changedCorner2 = corner2,
       changedCorner3 = corner3,
       changedCorner4 = corner4;
+    let changedSide1 = side1,
+      changedSide2 = side2,
+      changedSide3 = side3,
+      changedSide4 = side4;
     // Source Logic - remove card
     if (source.droppableId === 'KCHAND') {
       add = changedHand[source.index];
@@ -191,6 +202,9 @@ function App() {
     } else if (source.droppableId === 'KCCORNER4') {
       add = changedCorner4[source.index];
       changedCorner4.splice(source.index, 1);
+    } else if (source.droppableId === 'KCSIDE1') {
+      add = changedSide1[changedSide1.length - 1];
+      changedSide1.splice(changedSide1.length - 1, 1);
     }
 
     // Destination Logic
@@ -206,22 +220,34 @@ function App() {
       changedCorner3.splice(destination.index, 1, add);
     } else if (destination.droppableId === 'KCCORNER4') {
       changedCorner4.splice(destination.index, 1, add);
+    } else if (destination.droppableId === 'KCSIDE1') {
+      changedSide1.splice(destination.index, 0, add);
     }
     setHandPC(changedHandPC);
     setHand(changedHand);
     setCornerPiles(() => {
-          return {
-            corner1: changedCorner1,
-            corner2: changedCorner2,
-            corner3: changedCorner3,
-            corner4: changedCorner4,
-          };
-        });
+      return {
+        corner1: changedCorner1,
+        corner2: changedCorner2,
+        corner3: changedCorner3,
+        corner4: changedCorner4,
+      };
+    });
+    setSidePiles(() => {
+      return {
+        side1: changedSide1,
+        side2: changedSide2,
+        side3: changedSide3,
+        side4: changedSide4,
+      };
+    });
+    console.table(changedSide1);
   };
 
   // The following 'if' statement is to stop an initial render error.
   //    UseEffect is executed after an initial render.
   if (hand === undefined || handPC === undefined) return null;
+  //console.log('before',side1,'after',side1.splice(1,side1.length - 2));
   //
   // RETURN
   return (
@@ -276,24 +302,50 @@ function App() {
           </div>
         </div>
         <div className="Side-section">
-          <div className="Side">
-            <span>Side 1</span>
-            <br></br>
-            <img className="img-card" src={side1[0]} alt="" />
-            <img className="img-card" src={side1[side1.length === 1 ? 1 : side1.length - 1]} alt="" />
-          </div>
+          <Droppable droppableId="KCSIDE1" direction="horizontal">
+            {provided => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                <div className="Side">
+                  <span>Side 1</span>
+                  <br></br>
+
+                  {side1
+                    .filter((item, index, side1) => (index === 0 || index === side1.length - 1))
+                    .map((item, index) => (
+                    <Draggable draggableId={item.code} index={index} key={item.code}>
+                      {provided => (
+                        <img
+                          className="img-card"
+                          src={item.cardImage}
+                          alt=""
+                          {...provided.draggableProps}
+                          ref={provided.innerRef}
+                          {...provided.dragHandleProps}
+                        />
+                      )}
+                    </Draggable>
+                  ))}
+
+                  {provided.placeholder}
+                </div>
+              </div>
+            )}
+          </Droppable>
+
           <div className="Side">
             <span>Side 2</span>
             <br></br>
             <img className="img-card" src={side2[0]} alt="" />
             <img className="img-card" src={side2[side2.length === 1 ? 1 : side2.length - 1]} alt="" />
           </div>
+
           <div className="Side">
             <span>Side 3</span>
             <br></br>
             <img className="img-card" src={side3[0]} alt="" />
             <img className="img-card" src={side3[side3.length === 1 ? 1 : side3.length - 1]} alt="" />
           </div>
+
           <div className="Side">
             <span>Side 4</span>
             <br></br>
@@ -303,10 +355,10 @@ function App() {
         </div>
 
         <div className="Corner-section">
-        <Droppable droppableId="KCCORNER1" direction="horizontal">
-          {provided => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              <div className="Corner">
+          <Droppable droppableId="KCCORNER1" direction="horizontal">
+            {provided => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                <div className="Corner">
                   <span>Corner 1</span>
                   <br></br>
                   {corner1.map((item, index) => (
@@ -324,14 +376,14 @@ function App() {
                     </Draggable>
                   ))}
                   {provided.placeholder}
+                </div>
               </div>
-            </div>
-          )}
-        </Droppable>
-        <Droppable droppableId="KCCORNER2" direction="horizontal">
-          {provided => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              <div className="Corner">
+            )}
+          </Droppable>
+          <Droppable droppableId="KCCORNER2" direction="horizontal">
+            {provided => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                <div className="Corner">
                   <span>Corner 2</span>
                   <br></br>
                   {corner2.map((item, index) => (
@@ -349,14 +401,14 @@ function App() {
                     </Draggable>
                   ))}
                   {provided.placeholder}
+                </div>
               </div>
-            </div>
-          )}
-        </Droppable>
-        <Droppable droppableId="KCCORNER3" direction="horizontal">
-          {provided => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              <div className="Corner">
+            )}
+          </Droppable>
+          <Droppable droppableId="KCCORNER3" direction="horizontal">
+            {provided => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                <div className="Corner">
                   <span>Corner 3</span>
                   <br></br>
                   {corner3.map((item, index) => (
@@ -374,14 +426,14 @@ function App() {
                     </Draggable>
                   ))}
                   {provided.placeholder}
+                </div>
               </div>
-            </div>
-          )}
-        </Droppable>
-        <Droppable droppableId="KCCORNER4" direction="horizontal">
-          {provided => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              <div className="Corner">
+            )}
+          </Droppable>
+          <Droppable droppableId="KCCORNER4" direction="horizontal">
+            {provided => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                <div className="Corner">
                   <span>Corner 4</span>
                   <br></br>
                   {corner4.map((item, index) => (
@@ -399,12 +451,10 @@ function App() {
                     </Draggable>
                   ))}
                   {provided.placeholder}
+                </div>
               </div>
-            </div>
-          )}
-        </Droppable>
-
-          
+            )}
+          </Droppable>
         </div>
         <Droppable droppableId="KCHAND" direction="horizontal">
           {provided => (
@@ -460,7 +510,6 @@ function App() {
             </div>
           )}
         </Droppable>
-
       </DragDropContext>
     </div>
   );
