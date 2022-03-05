@@ -132,16 +132,24 @@ function App() {
           workHandPC.push(handEntry);
         }
         //  load Side Pile's
-        handEntry = {
-          cardImage: data.cards[i].image,
-          sortKey: 1,
-          sortCard: 1,
-          code: data.cards[i].code,
+        for (i = 14; i < 18; i++) {
+          sortCard = calcSortCard(data.cards[i].value);
+          handEntry = {
+            cardImage: data.cards[i].image,
+            sortKey: i,
+            sortCard: sortCard,
+            code: data.cards[i].code,
+          };
+          if (i === 14) {
+            workSide1.push(handEntry)
+          } else if (i === 15) {
+            workSide2.push(handEntry)
+          } else if (i === 16) {
+            workSide3.push(handEntry)
+          } else if (i === 17) {
+            workSide4.push(handEntry)
+          }
         };
-        workSide1.push(handEntry);
-        workSide2.push(data.cards[15].image);
-        workSide3.push(data.cards[16].image);
-        workSide4.push(data.cards[17].image);
 
         setHand(workHand);
         setHandPC(workHandPC);
@@ -151,9 +159,8 @@ function App() {
             side2: workSide2,
             side3: workSide3,
             side4: workSide4,
-          };
+          }
         });
-        console.table(workSide1);
         setDeckId(data.deck_id);
       });
   }, []);
@@ -205,6 +212,15 @@ function App() {
     } else if (source.droppableId === 'KCSIDE1') {
       add = changedSide1[changedSide1.length - 1];
       changedSide1.splice(changedSide1.length - 1, 1);
+    } else if (source.droppableId === 'KCSIDE2') {
+      add = changedSide2[changedSide2.length - 1];
+      changedSide2.splice(changedSide2.length - 1, 1);
+    } else if (source.droppableId === 'KCSIDE3') {
+      add = changedSide3[changedSide3.length - 1];
+      changedSide3.splice(changedSide3.length - 1, 1);
+    } else if (source.droppableId === 'KCSIDE4') {
+      add = changedSide4[changedSide4.length - 1];
+      changedSide4.splice(changedSide4.length - 1, 1);
     }
 
     // Destination Logic
@@ -222,6 +238,12 @@ function App() {
       changedCorner4.splice(destination.index, 1, add);
     } else if (destination.droppableId === 'KCSIDE1') {
       changedSide1.splice(destination.index, 0, add);
+    } else if (destination.droppableId === 'KCSIDE2') {
+      changedSide2.splice(destination.index, 0, add);
+    } else if (destination.droppableId === 'KCSIDE3') {
+      changedSide3.splice(destination.index, 0, add);
+    } else if (destination.droppableId === 'KCSIDE4') {
+      changedSide4.splice(destination.index, 0, add);
     }
     setHandPC(changedHandPC);
     setHand(changedHand);
@@ -241,13 +263,11 @@ function App() {
         side4: changedSide4,
       };
     });
-    console.table(changedSide1);
   };
 
   // The following 'if' statement is to stop an initial render error.
   //    UseEffect is executed after an initial render.
   if (hand === undefined || handPC === undefined) return null;
-  //console.log('before',side1,'after',side1.splice(1,side1.length - 2));
   //
   // RETURN
   return (
@@ -332,26 +352,96 @@ function App() {
             )}
           </Droppable>
 
-          <div className="Side">
-            <span>Side 2</span>
-            <br></br>
-            <img className="img-card" src={side2[0]} alt="" />
-            <img className="img-card" src={side2[side2.length === 1 ? 1 : side2.length - 1]} alt="" />
-          </div>
+          <Droppable droppableId="KCSIDE2" direction="horizontal">
+            {provided => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                <div className="Side">
+                  <span>Side 2</span>
+                  <br></br>
 
-          <div className="Side">
-            <span>Side 3</span>
-            <br></br>
-            <img className="img-card" src={side3[0]} alt="" />
-            <img className="img-card" src={side3[side3.length === 1 ? 1 : side3.length - 1]} alt="" />
-          </div>
+                  {side2
+                    .filter((item, index, side2) => (index === 0 || index === side2.length - 1))
+                    .map((item, index) => (
+                    <Draggable draggableId={item.code} index={index} key={item.code}>
+                      {provided => (
+                        <img
+                          className="img-card"
+                          src={item.cardImage}
+                          alt=""
+                          {...provided.draggableProps}
+                          ref={provided.innerRef}
+                          {...provided.dragHandleProps}
+                        />
+                      )}
+                    </Draggable>
+                  ))}
 
-          <div className="Side">
-            <span>Side 4</span>
-            <br></br>
-            <img className="img-card" src={side4[0]} alt="" />
-            <img className="img-card" src={side4[side4.length === 1 ? 1 : side4.length - 1]} alt="" />
-          </div>
+                  {provided.placeholder}
+                </div>
+              </div>
+            )}
+          </Droppable>
+
+          <Droppable droppableId="KCSIDE3" direction="horizontal">
+            {provided => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                <div className="Side">
+                  <span>Side 3</span>
+                  <br></br>
+
+                  {side3
+                    .filter((item, index, side3) => (index === 0 || index === side3.length - 1))
+                    .map((item, index) => (
+                    <Draggable draggableId={item.code} index={index} key={item.code}>
+                      {provided => (
+                        <img
+                          className="img-card"
+                          src={item.cardImage}
+                          alt=""
+                          {...provided.draggableProps}
+                          ref={provided.innerRef}
+                          {...provided.dragHandleProps}
+                        />
+                      )}
+                    </Draggable>
+                  ))}
+
+                  {provided.placeholder}
+                </div>
+              </div>
+            )}
+          </Droppable>
+
+          <Droppable droppableId="KCSIDE4" direction="horizontal">
+            {provided => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                <div className="Side">
+                  <span>Side 4</span>
+                  <br></br>
+
+                  {side4
+                    .filter((item, index, side4) => (index === 0 || index === side4.length - 1))
+                    .map((item, index) => (
+                    <Draggable draggableId={item.code} index={index} key={item.code}>
+                      {provided => (
+                        <img
+                          className="img-card"
+                          src={item.cardImage}
+                          alt=""
+                          {...provided.draggableProps}
+                          ref={provided.innerRef}
+                          {...provided.dragHandleProps}
+                        />
+                      )}
+                    </Draggable>
+                  ))}
+
+                  {provided.placeholder}
+                </div>
+              </div>
+            )}
+          </Droppable>
+
         </div>
 
         <div className="Corner-section">
