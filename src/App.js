@@ -3,14 +3,13 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import './App.css';
 
 function App() {
-  // Global variables
+  // url variables
   const urlDrawHand = 'https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=1';
   const urlGetDraw = 'https://deckofcardsapi.com/api/deck/new/draw/?count=18';
-  // const urlDrawHand2 = urlDrawHand.replace("<<deck_id>>", deckId);
 
   // State
   const [{ message }, setGameState] = useState({
-    message: 'Draw card',
+    message: 'Draw card', 
   });
   const [{ side1, side2, side3, side4 }, setSidePiles] = useState({
     side1: [],
@@ -40,13 +39,30 @@ function App() {
 
   // Draw card
   const onDraw = useCallback(() => {
-    console.log('Draw');
-    setGameState(() => {
-      return {
-        message: 'Play',
-      };
-    });
-  }, []);
+    let urlDrawHand2 = urlDrawHand.replace("<<deck_id>>", deckId);
+    fetch(urlDrawHand2)
+      .then(response => response.json())
+      .then(data => {
+        let workHand = hand;
+        let handEntry = {},
+          sortKey = 0,
+          sortCard = 0;
+        sortCard = calcSortCard(data.cards[0].value);
+        handEntry = {
+          cardImage: data.cards[0].image,
+          sortKey: workHand.length,
+          sortCard: sortCard,
+          code: data.cards[0].code,
+        };
+        workHand.push(handEntry);
+        setHand(workHand);
+        setGameState(() => {
+          return {
+            message: 'Card drawn',
+          };
+        });
+      });
+  }, [deckId]);
 
   // Turn complete
   const onTurn = useCallback(() => {
@@ -161,6 +177,7 @@ function App() {
             side4: workSide4,
           }
         });
+        console.log('deck id',data.deck_id);
         setDeckId(data.deck_id);
       });
   }, []);
