@@ -198,17 +198,17 @@ function App() {
       add = changedHandPC[source.index];
       changedHandPC.splice(source.index, 1);
     } else if (source.droppableId === 'KCCORNER1') {
-      add = changedCorner1[source.index];
-      changedCorner1.splice(source.index, 1);
+      add = changedCorner1[changedCorner1.length - 1];
+      changedCorner1.splice(changedCorner1.length - 1, 1);
     } else if (source.droppableId === 'KCCORNER2') {
-      add = changedCorner2[source.index];
-      changedCorner2.splice(source.index, 1);
+      add = changedCorner2[changedCorner2.length - 1];
+      changedCorner2.splice(changedCorner2.length - 1, 1);
     } else if (source.droppableId === 'KCCORNER3') {
-      add = changedCorner3[source.index];
-      changedCorner3.splice(source.index, 1);
+      add = changedCorner3[changedCorner3.length - 1];
+      changedCorner3.splice(changedCorner3.length - 1, 1);
     } else if (source.droppableId === 'KCCORNER4') {
-      add = changedCorner4[source.index];
-      changedCorner4.splice(source.index, 1);
+      add = changedCorner4[changedCorner4.length - 1];
+      changedCorner4.splice(changedCorner4.length - 1, 1);
     } else if (source.droppableId === 'KCSIDE1') {
       add = changedSide1[changedSide1.length - 1];
       changedSide1.splice(changedSide1.length - 1, 1);
@@ -229,21 +229,21 @@ function App() {
     } else if (destination.droppableId === 'KCHANDPC') {
       changedHandPC.splice(destination.index, 0, add);
     } else if (destination.droppableId === 'KCCORNER1') {
-      changedCorner1.splice(destination.index, 1, add);
+      changedCorner1.splice(changedCorner1.length, 0, add);
     } else if (destination.droppableId === 'KCCORNER2') {
-      changedCorner2.splice(destination.index, 1, add);
+      changedCorner2.splice(changedCorner2.length, 0, add);
     } else if (destination.droppableId === 'KCCORNER3') {
-      changedCorner3.splice(destination.index, 1, add);
+      changedCorner3.splice(changedCorner3.length, 0, add);
     } else if (destination.droppableId === 'KCCORNER4') {
-      changedCorner4.splice(destination.index, 1, add);
+      changedCorner4.splice(changedCorner4.length, 0, add);
     } else if (destination.droppableId === 'KCSIDE1') {
-      changedSide1.splice(destination.index, 0, add);
+      changedSide1.splice(changedSide1.length, 0, add);
     } else if (destination.droppableId === 'KCSIDE2') {
-      changedSide2.splice(destination.index, 0, add);
+      changedSide2.splice(changedSide2.length, 0, add);
     } else if (destination.droppableId === 'KCSIDE3') {
-      changedSide3.splice(destination.index, 0, add);
+      changedSide3.splice(changedSide3.length, 0, add);
     } else if (destination.droppableId === 'KCSIDE4') {
-      changedSide4.splice(destination.index, 0, add);
+      changedSide4.splice(changedSide4.length, 0, add);
     }
     setHandPC(changedHandPC);
     setHand(changedHand);
@@ -451,7 +451,9 @@ function App() {
                 <div className="Corner">
                   <span>Corner 1</span>
                   <br></br>
-                  {corner1.map((item, index) => (
+                  {corner1
+                    .filter((item, index, corner1) => (index === corner1.length - 1))
+                    .map((item, index) => (
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
                         <img
@@ -476,7 +478,9 @@ function App() {
                 <div className="Corner">
                   <span>Corner 2</span>
                   <br></br>
-                  {corner2.map((item, index) => (
+                  {corner2
+                    .filter((item, index, corner2) => (index === corner2.length - 1))
+                    .map((item, index) => (
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
                         <img
@@ -501,7 +505,9 @@ function App() {
                 <div className="Corner">
                   <span>Corner 3</span>
                   <br></br>
-                  {corner3.map((item, index) => (
+                  {corner3
+                    .filter((item, index, corner3) => (index === corner3.length - 1))
+                    .map((item, index) => (
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
                         <img
@@ -526,7 +532,9 @@ function App() {
                 <div className="Corner">
                   <span>Corner 4</span>
                   <br></br>
-                  {corner4.map((item, index) => (
+                  {corner4
+                    .filter((item, index, corner4) => (index === corner4.length - 1))
+                    .map((item, index) => (
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
                         <img
