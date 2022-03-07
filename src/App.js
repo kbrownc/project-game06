@@ -30,11 +30,7 @@ function App() {
   // Reset game
   const onReset = useCallback(() => {
     console.log('Reset');
-    setGameState(() => {
-      return {
-        message: 'Draw card',
-      };
-    });
+    boardSetup();
   }, []);
 
   // Draw card
@@ -43,6 +39,7 @@ function App() {
     fetch(urlDrawHand2)
       .then(response => response.json())
       .then(data => {
+        if (data.remaining === 0) {console.log('no cards left in deck')};
         let workHand = hand;
         let handEntry = {},
           sortKey = 0,
@@ -62,11 +59,11 @@ function App() {
           };
         });
       });
-  }, [deckId]);
+  }, [deckId,hand]);
 
   // Turn complete
   const onTurn = useCallback(() => {
-    console.log('Turn');
+    console.log('Computer now plays');
     setGameState(() => {
       return {
         message: 'Draw card',
@@ -77,6 +74,7 @@ function App() {
   // About the game
   const onAbout = useCallback(() => {
     console.log('About');
+    alert("How to play the game");
     setGameState(() => {
       return {
         message: 'Draw card',
@@ -94,7 +92,7 @@ function App() {
     });
   }, []);
 
-  // Expand card pile
+  // Calculate sortCard variable
   const calcSortCard = value => {
     let sortCard = 0;
     if (value === 'KING') {
@@ -111,8 +109,9 @@ function App() {
     return sortCard;
   };
 
-  // useEffect - Get 18 cards from deck
-  useEffect(() => {
+  // boardSetup - Get 18 cards from deck and place on board
+  const boardSetup = useCallback(() => {
+    console.log('boardSetup');
     fetch(urlGetDraw)
       .then(response => response.json())
       .then(data => {
@@ -177,10 +176,19 @@ function App() {
             side4: workSide4,
           }
         });
-        console.log('deck id',data.deck_id);
         setDeckId(data.deck_id);
-      });
+        setGameState(() => {
+          return {
+            message: 'Draw card',
+          };
+        });
+      })
   }, []);
+
+  // useEffect - Get 18 cards from deck
+  useEffect(() => {
+    boardSetup();
+  }, [boardSetup]);
 
   // onDragEnd:
   //      To support DragDropContext functionality
@@ -289,6 +297,7 @@ function App() {
   // RETURN
   return (
     <div className="Container">
+      <span className="Title">Kings Corner</span>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="Nav">
           <div className="Box Button" style={{ gridColumn: 1, gridRow: 1 }} onClick={onReset}>
