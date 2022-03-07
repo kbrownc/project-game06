@@ -478,7 +478,7 @@ function App() {
                   <span>Corner 1</span>
                   <br></br>
                   {corner1
-                    .filter((item, index, corner1) => (index === corner1.length - 1))
+                    .filter((item, index, corner1) => (index === 0 || index === corner1.length - 1))
                     .map((item, index) => (
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
@@ -505,7 +505,7 @@ function App() {
                   <span>Corner 2</span>
                   <br></br>
                   {corner2
-                    .filter((item, index, corner2) => (index === corner2.length - 1))
+                    .filter((item, index, corner2) => (index === 0 || index === corner2.length - 1))
                     .map((item, index) => (
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
@@ -532,7 +532,7 @@ function App() {
                   <span>Corner 3</span>
                   <br></br>
                   {corner3
-                    .filter((item, index, corner3) => (index === corner3.length - 1))
+                    .filter((item, index, corner3) => (index === 0 || index === corner3.length - 1))
                     .map((item, index) => (
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
@@ -559,7 +559,7 @@ function App() {
                   <span>Corner 4</span>
                   <br></br>
                   {corner4
-                    .filter((item, index, corner4) => (index === corner4.length - 1))
+                    .filter((item, index, corner4) => (index === 0 || index === corner4.length - 1))
                     .map((item, index) => (
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
