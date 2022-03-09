@@ -354,28 +354,28 @@ function App() {
         <div className="Nav-expand">
           <div
             className="Box-expand Button"
-            style={{ gridColumn: 1, gridRow: 1 }}
+            style={{ backgroundColor: (expand1 === 'Expand') ? 'green' : 'red'}}
             onClick={() => onExpand(1)}
           >
             {expand1}
           </div>
           <div
             className="Box-expand Button"
-            style={{ gridColumn: 2, gridRow: 1 }}
+            style={{ backgroundColor: (expand2 === 'Expand') ? 'green' : 'red'}}
             onClick={() => onExpand(2)}
           >
             {expand2}
           </div>
           <div
             className="Box-expand Button"
-            style={{ gridColumn: 3, gridRow: 1 }}
+            style={{ backgroundColor: (expand3 === 'Expand') ? 'green' : 'red'}}
             onClick={() => onExpand(3)}
           >
             {expand3}
           </div>
           <div
             className="Box-expand Button"
-            style={{ gridColumn: 4, gridRow: 1 }}
+            style={{ backgroundColor: (expand4 === 'Expand') ? 'green' : 'red'}}
             onClick={() => onExpand(4)}
           >
             {expand4}
