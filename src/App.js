@@ -9,7 +9,7 @@ function App() {
 
   // State
   const [{ message }, setGameState] = useState({
-    message: 'Draw card', 
+    message: 'Draw card',
   });
   const [{ side1, side2, side3, side4 }, setSidePiles] = useState({
     side1: [],
@@ -23,15 +23,13 @@ function App() {
     corner3: [],
     corner4: [],
   });
-  const [{ expand1, expand2, expand3, expand4 }, setExpand] = useState({
-    expand1: 'Expand',
-    expand2: 'Expand',
-    expand3: 'Expand',
-    expand4: 'Expand',
-  });
   const [deckId, setDeckId] = useState('');
   const [hand, setHand] = useState();
   const [handPC, setHandPC] = useState();
+  const [expand1, setExpand1] = useState('Expand');
+  const [expand2, setExpand2] = useState('Expand');
+  const [expand3, setExpand3] = useState('Expand');
+  const [expand4, setExpand4] = useState('Expand');
 
   // Reset game
   const onReset = useCallback(() => {
@@ -41,11 +39,13 @@ function App() {
 
   // Draw card
   const onDraw = useCallback(() => {
-    let urlDrawHand2 = urlDrawHand.replace("<<deck_id>>", deckId);
+    let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
     fetch(urlDrawHand2)
       .then(response => response.json())
       .then(data => {
-        if (data.remaining === 0) {console.log('no cards left in deck')};
+        if (data.remaining === 0) {
+          console.log('no cards left in deck');
+        }
         let workHand = hand;
         let handEntry = {},
           sortKey = 0,
@@ -65,7 +65,7 @@ function App() {
           };
         });
       });
-  }, [deckId,hand]);
+  }, [deckId, hand]);
 
   // Turn complete
   const onTurn = useCallback(() => {
@@ -80,7 +80,7 @@ function App() {
   // About the game
   const onAbout = useCallback(() => {
     console.log('About');
-    alert("How to play the game");
+    alert('How to play the game');
     setGameState(() => {
       return {
         message: 'Draw card',
@@ -89,33 +89,42 @@ function App() {
   }, []);
 
   // Expand card pile
-  const onExpand = useCallback(num => {
-    console.log('Expand', num);
-    if (expand1 === 'Expand') {
-      setExpand(() => {
+  const onExpand = useCallback(
+    num => {
+      console.log('Expand', num);
+      if (num === 1) {
+        if (expand1 === 'Expand') {
+          setExpand1('Collapse');
+        } else {
+          setExpand1('Expand');
+        }
+      } else if (num === 2) {
+        if (expand2 === 'Expand') {
+          setExpand2('Collapse');
+        } else {
+          setExpand2('Expand');
+        }
+      } else if (num === 3) {
+        if (expand3 === 'Expand') {
+          setExpand3('Collapse');
+        } else {
+          setExpand3('Expand');
+        }
+      } else if (num === 4) {
+        if (expand4 === 'Expand') {
+          setExpand4('Collapse');
+        } else {
+          setExpand4('Expand');
+        }
+      }
+      setGameState(() => {
         return {
-          expand1: 'Collapse',
-          expand2: 'Expand',
-          expand3: 'Expand',
-          expand4: 'Expand',
+          message: 'Card pile expanded',
         };
       });
-    } else {
-      setExpand(() => {
-        return {
-          expand1: 'Expand',
-          expand2: 'Expand',
-          expand3: 'Expand',
-          expand4: 'Expand',
-        };
-      });
-    };
-    setGameState(() => {
-      return {
-        message: 'Card pile expanded',
-      };
-    });
-  }, [expand1,expand2,expand3,expand4]);
+    },
+    [expand1, expand2, expand3, expand4]
+  );
 
   // Calculate sortCard variable
   const calcSortCard = value => {
@@ -181,15 +190,15 @@ function App() {
             code: data.cards[i].code,
           };
           if (i === 14) {
-            workSide1.push(handEntry)
+            workSide1.push(handEntry);
           } else if (i === 15) {
-            workSide2.push(handEntry)
+            workSide2.push(handEntry);
           } else if (i === 16) {
-            workSide3.push(handEntry)
+            workSide3.push(handEntry);
           } else if (i === 17) {
-            workSide4.push(handEntry)
+            workSide4.push(handEntry);
           }
-        };
+        }
 
         setHand(workHand);
         setHandPC(workHandPC);
@@ -199,7 +208,7 @@ function App() {
             side2: workSide2,
             side3: workSide3,
             side4: workSide4,
-          }
+          };
         });
         setDeckId(data.deck_id);
         setGameState(() => {
@@ -207,7 +216,7 @@ function App() {
             message: 'Draw card',
           };
         });
-      })
+      });
   }, []);
 
   // useEffect - Get 18 cards from deck
@@ -381,21 +390,21 @@ function App() {
                   <br></br>
 
                   {side1
-                    .filter((item, index, side1) => (index === 0 || index === side1.length - 1))  
+                    .filter((item, index, side1) => index === 0 || index === side1.length - 1)
                     .map((item, index) => (
-                    <Draggable draggableId={item.code} index={index} key={item.code}>
-                      {provided => (
-                        <img
-                          className="img-card"
-                          src={item.cardImage}
-                          alt=""
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                          {...provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
+                      <Draggable draggableId={item.code} index={index} key={item.code}>
+                        {provided => (
+                          <img
+                            className="img-card"
+                            src={item.cardImage}
+                            alt=""
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                            {...provided.dragHandleProps}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
 
                   {provided.placeholder}
                 </div>
@@ -411,21 +420,21 @@ function App() {
                   <br></br>
 
                   {side2
-                    .filter((item, index, side2) => (index === 0 || index === side2.length - 1))
+                    .filter((item, index, side2) => index === 0 || index === side2.length - 1)
                     .map((item, index) => (
-                    <Draggable draggableId={item.code} index={index} key={item.code}>
-                      {provided => (
-                        <img
-                          className="img-card"
-                          src={item.cardImage}
-                          alt=""
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                          {...provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
+                      <Draggable draggableId={item.code} index={index} key={item.code}>
+                        {provided => (
+                          <img
+                            className="img-card"
+                            src={item.cardImage}
+                            alt=""
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                            {...provided.dragHandleProps}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
 
                   {provided.placeholder}
                 </div>
@@ -441,21 +450,21 @@ function App() {
                   <br></br>
 
                   {side3
-                    .filter((item, index, side3) => (index === 0 || index === side3.length - 1))
+                    .filter((item, index, side3) => index === 0 || index === side3.length - 1)
                     .map((item, index) => (
-                    <Draggable draggableId={item.code} index={index} key={item.code}>
-                      {provided => (
-                        <img
-                          className="img-card"
-                          src={item.cardImage}
-                          alt=""
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                          {...provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
+                      <Draggable draggableId={item.code} index={index} key={item.code}>
+                        {provided => (
+                          <img
+                            className="img-card"
+                            src={item.cardImage}
+                            alt=""
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                            {...provided.dragHandleProps}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
 
                   {provided.placeholder}
                 </div>
@@ -471,28 +480,27 @@ function App() {
                   <br></br>
 
                   {side4
-                    .filter((item, index, side4) => (index === 0 || index === side4.length - 1))
+                    .filter((item, index, side4) => index === 0 || index === side4.length - 1)
                     .map((item, index) => (
-                    <Draggable draggableId={item.code} index={index} key={item.code}>
-                      {provided => (
-                        <img
-                          className="img-card"
-                          src={item.cardImage}
-                          alt=""
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                          {...provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
+                      <Draggable draggableId={item.code} index={index} key={item.code}>
+                        {provided => (
+                          <img
+                            className="img-card"
+                            src={item.cardImage}
+                            alt=""
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                            {...provided.dragHandleProps}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
 
                   {provided.placeholder}
                 </div>
               </div>
             )}
           </Droppable>
-
         </div>
 
         <div className="Corner-section">
@@ -503,21 +511,21 @@ function App() {
                   <span>Corner 1</span>
                   <br></br>
                   {corner1
-                    .filter((item, index, corner1) => (index === 0 || index === corner1.length - 1))
+                    .filter((item, index, corner1) => index === 0 || index === corner1.length - 1)
                     .map((item, index) => (
-                    <Draggable draggableId={item.code} index={index} key={item.code}>
-                      {provided => (
-                        <img
-                          className="img-card"
-                          src={item.cardImage}
-                          alt=""
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                          {...provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
+                      <Draggable draggableId={item.code} index={index} key={item.code}>
+                        {provided => (
+                          <img
+                            className="img-card"
+                            src={item.cardImage}
+                            alt=""
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                            {...provided.dragHandleProps}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
                   {provided.placeholder}
                 </div>
               </div>
@@ -530,21 +538,21 @@ function App() {
                   <span>Corner 2</span>
                   <br></br>
                   {corner2
-                    .filter((item, index, corner2) => (index === 0 || index === corner2.length - 1))
+                    .filter((item, index, corner2) => index === 0 || index === corner2.length - 1)
                     .map((item, index) => (
-                    <Draggable draggableId={item.code} index={index} key={item.code}>
-                      {provided => (
-                        <img
-                          className="img-card"
-                          src={item.cardImage}
-                          alt=""
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                          {...provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
+                      <Draggable draggableId={item.code} index={index} key={item.code}>
+                        {provided => (
+                          <img
+                            className="img-card"
+                            src={item.cardImage}
+                            alt=""
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                            {...provided.dragHandleProps}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
                   {provided.placeholder}
                 </div>
               </div>
@@ -557,21 +565,21 @@ function App() {
                   <span>Corner 3</span>
                   <br></br>
                   {corner3
-                    .filter((item, index, corner3) => (index === 0 || index === corner3.length - 1))
+                    .filter((item, index, corner3) => index === 0 || index === corner3.length - 1)
                     .map((item, index) => (
-                    <Draggable draggableId={item.code} index={index} key={item.code}>
-                      {provided => (
-                        <img
-                          className="img-card"
-                          src={item.cardImage}
-                          alt=""
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                          {...provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
+                      <Draggable draggableId={item.code} index={index} key={item.code}>
+                        {provided => (
+                          <img
+                            className="img-card"
+                            src={item.cardImage}
+                            alt=""
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                            {...provided.dragHandleProps}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
                   {provided.placeholder}
                 </div>
               </div>
@@ -584,21 +592,21 @@ function App() {
                   <span>Corner 4</span>
                   <br></br>
                   {corner4
-                    .filter((item, index, corner4) => (index === 0 || index === corner4.length - 1))
+                    .filter((item, index, corner4) => index === 0 || index === corner4.length - 1)
                     .map((item, index) => (
-                    <Draggable draggableId={item.code} index={index} key={item.code}>
-                      {provided => (
-                        <img
-                          className="img-card"
-                          src={item.cardImage}
-                          alt=""
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                          {...provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
+                      <Draggable draggableId={item.code} index={index} key={item.code}>
+                        {provided => (
+                          <img
+                            className="img-card"
+                            src={item.cardImage}
+                            alt=""
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                            {...provided.dragHandleProps}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
                   {provided.placeholder}
                 </div>
               </div>
