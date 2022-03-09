@@ -23,6 +23,12 @@ function App() {
     corner3: [],
     corner4: [],
   });
+  const [{ expand1, expand2, expand3, expand4 }, setExpand] = useState({
+    expand1: 'Expand',
+    expand2: 'Expand',
+    expand3: 'Expand',
+    expand4: 'Expand',
+  });
   const [deckId, setDeckId] = useState('');
   const [hand, setHand] = useState();
   const [handPC, setHandPC] = useState();
@@ -85,12 +91,31 @@ function App() {
   // Expand card pile
   const onExpand = useCallback(num => {
     console.log('Expand', num);
+    if (expand1 === 'Expand') {
+      setExpand(() => {
+        return {
+          expand1: 'Collapse',
+          expand2: 'Expand',
+          expand3: 'Expand',
+          expand4: 'Expand',
+        };
+      });
+    } else {
+      setExpand(() => {
+        return {
+          expand1: 'Expand',
+          expand2: 'Expand',
+          expand3: 'Expand',
+          expand4: 'Expand',
+        };
+      });
+    };
     setGameState(() => {
       return {
         message: 'Card pile expanded',
       };
     });
-  }, []);
+  }, [expand1,expand2,expand3,expand4]);
 
   // Calculate sortCard variable
   const calcSortCard = value => {
@@ -323,28 +348,28 @@ function App() {
             style={{ gridColumn: 1, gridRow: 1 }}
             onClick={() => onExpand(1)}
           >
-            Expand
+            {expand1}
           </div>
           <div
             className="Box-expand Button"
             style={{ gridColumn: 2, gridRow: 1 }}
             onClick={() => onExpand(2)}
           >
-            Expand
+            {expand2}
           </div>
           <div
             className="Box-expand Button"
             style={{ gridColumn: 3, gridRow: 1 }}
             onClick={() => onExpand(3)}
           >
-            Expand
+            {expand3}
           </div>
           <div
             className="Box-expand Button"
             style={{ gridColumn: 4, gridRow: 1 }}
             onClick={() => onExpand(4)}
           >
-            Expand
+            {expand4}
           </div>
         </div>
         <div className="Side-section">
@@ -356,7 +381,7 @@ function App() {
                   <br></br>
 
                   {side1
-                    .filter((item, index, side1) => (index === 0 || index === side1.length - 1))
+                    .filter((item, index, side1) => (index === 0 || index === side1.length - 1))  
                     .map((item, index) => (
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
