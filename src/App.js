@@ -95,7 +95,6 @@ function App() {
   // Expand card pile
   const onExpand = useCallback(
     num => {
-      console.log('Expand', num);
       if (num === 1) {
         if (expand1 === 'Expand') {
           setExpand1('Collapse');
@@ -118,7 +117,7 @@ function App() {
         if (expand4 === 'Expand') {
           setExpand4('Collapse');
         } else {
-          setExpand8('Expand');
+          setExpand4('Expand');
         }
       } else if (num === 5) {
         if (expand5 === 'Expand') {
