@@ -30,6 +30,10 @@ function App() {
   const [expand2, setExpand2] = useState('Expand');
   const [expand3, setExpand3] = useState('Expand');
   const [expand4, setExpand4] = useState('Expand');
+  const [expand5, setExpand5] = useState('Expand');
+  const [expand6, setExpand6] = useState('Expand');
+  const [expand7, setExpand7] = useState('Expand');
+  const [expand8, setExpand8] = useState('Expand');
 
   // Reset game
   const onReset = useCallback(() => {
@@ -114,7 +118,31 @@ function App() {
         if (expand4 === 'Expand') {
           setExpand4('Collapse');
         } else {
-          setExpand4('Expand');
+          setExpand8('Expand');
+        }
+      } else if (num === 5) {
+        if (expand5 === 'Expand') {
+          setExpand5('Collapse');
+        } else {
+          setExpand5('Expand');
+        }
+      } else if (num === 6) {
+        if (expand6 === 'Expand') {
+          setExpand6('Collapse');
+        } else {
+          setExpand6('Expand');
+        }
+      } else if (num === 7) {
+        if (expand7 === 'Expand') {
+          setExpand7('Collapse');
+        } else {
+          setExpand7('Expand');
+        }
+      } else if (num === 8) {
+        if (expand8 === 'Expand') {
+          setExpand8('Collapse');
+        } else {
+          setExpand8('Expand');
         }
       }
       setGameState(() => {
@@ -123,7 +151,7 @@ function App() {
         };
       });
     },
-    [expand1, expand2, expand3, expand4]
+    [expand1, expand2, expand3, expand4, expand5, expand6, expand7, expand8]
   );
 
   // Calculate sortCard variable
@@ -199,7 +227,6 @@ function App() {
             workSide4.push(handEntry);
           }
         }
-
         setHand(workHand);
         setHandPC(workHandPC);
         setSidePiles(() => {
@@ -354,28 +381,28 @@ function App() {
         <div className="Nav-expand">
           <div
             className="Box-expand Button"
-            style={{ backgroundColor: (expand1 === 'Expand') ? 'green' : 'red'}}
+            style={{ backgroundColor: expand1 === 'Expand' ? 'green' : 'red' }}
             onClick={() => onExpand(1)}
           >
             {expand1}
           </div>
           <div
             className="Box-expand Button"
-            style={{ backgroundColor: (expand2 === 'Expand') ? 'green' : 'red'}}
+            style={{ backgroundColor: expand2 === 'Expand' ? 'green' : 'red' }}
             onClick={() => onExpand(2)}
           >
             {expand2}
           </div>
           <div
             className="Box-expand Button"
-            style={{ backgroundColor: (expand3 === 'Expand') ? 'green' : 'red'}}
+            style={{ backgroundColor: expand3 === 'Expand' ? 'green' : 'red' }}
             onClick={() => onExpand(3)}
           >
             {expand3}
           </div>
           <div
             className="Box-expand Button"
-            style={{ backgroundColor: (expand4 === 'Expand') ? 'green' : 'red'}}
+            style={{ backgroundColor: expand4 === 'Expand' ? 'green' : 'red' }}
             onClick={() => onExpand(4)}
           >
             {expand4}
@@ -563,6 +590,37 @@ function App() {
           </Droppable>
         </div>
 
+        <div className="Nav-expand">
+          <div
+            className="Box-expand Button"
+            style={{ backgroundColor: expand5 === 'Expand' ? 'green' : 'red' }}
+            onClick={() => onExpand(5)}
+          >
+            {expand5}
+          </div>
+          <div
+            className="Box-expand Button"
+            style={{ backgroundColor: expand6 === 'Expand' ? 'green' : 'red' }}
+            onClick={() => onExpand(6)}
+          >
+            {expand6}
+          </div>
+          <div
+            className="Box-expand Button"
+            style={{ backgroundColor: expand7 === 'Expand' ? 'green' : 'red' }}
+            onClick={() => onExpand(7)}
+          >
+            {expand7}
+          </div>
+          <div
+            className="Box-expand Button"
+            style={{ backgroundColor: expand8 === 'Expand' ? 'green' : 'red' }}
+            onClick={() => onExpand(8)}
+          >
+            {expand8}
+          </div>
+        </div>
+
         <div className="Corner-section">
           <Droppable droppableId="CORNER1" direction="horizontal">
             {provided => (
@@ -570,109 +628,181 @@ function App() {
                 <div className="Corner">
                   <span>Corner 1</span>
                   <br></br>
-                  {corner1
-                    .filter((item, index, corner1) => index === 0 || index === corner1.length - 1)
-                    .map((item, index) => (
-                      <Draggable draggableId={item.code} index={index} key={item.code}>
-                        {provided => (
-                          <img
-                            className="img-card"
-                            src={item.cardImage}
-                            alt=""
-                            {...provided.draggableProps}
-                            ref={provided.innerRef}
-                            {...provided.dragHandleProps}
-                          />
-                        )}
-                      </Draggable>
-                    ))}
+
+                  {expand5 === 'Expand'
+                    ? corner1
+                        .filter((item, index, corner1) => index === 0 || index === corner1.length - 1)
+                        .map((item, index) => (
+                          <Draggable draggableId={item.code} index={index} key={item.code}>
+                            {provided => (
+                              <img
+                                className="img-card"
+                                src={item.cardImage}
+                                alt=""
+                                {...provided.draggableProps}
+                                ref={provided.innerRef}
+                                {...provided.dragHandleProps}
+                              />
+                            )}
+                          </Draggable>
+                        ))
+                    : corner1.map((item, index) => (
+                        <Draggable draggableId={item.code} index={index} key={item.code}>
+                          {provided => (
+                            <img
+                              className="img-card"
+                              src={item.cardImage}
+                              alt=""
+                              {...provided.draggableProps}
+                              ref={provided.innerRef}
+                              {...provided.dragHandleProps}
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+
                   {provided.placeholder}
                 </div>
               </div>
             )}
           </Droppable>
+
           <Droppable droppableId="CORNER2" direction="horizontal">
             {provided => (
               <div ref={provided.innerRef} {...provided.droppableProps}>
                 <div className="Corner">
                   <span>Corner 2</span>
                   <br></br>
-                  {corner2
-                    .filter((item, index, corner2) => index === 0 || index === corner2.length - 1)
-                    .map((item, index) => (
-                      <Draggable draggableId={item.code} index={index} key={item.code}>
-                        {provided => (
-                          <img
-                            className="img-card"
-                            src={item.cardImage}
-                            alt=""
-                            {...provided.draggableProps}
-                            ref={provided.innerRef}
-                            {...provided.dragHandleProps}
-                          />
-                        )}
-                      </Draggable>
-                    ))}
+
+                  {expand6 === 'Expand'
+                    ? corner2
+                        .filter((item, index, corner2) => index === 0 || index === corner2.length - 1)
+                        .map((item, index) => (
+                          <Draggable draggableId={item.code} index={index} key={item.code}>
+                            {provided => (
+                              <img
+                                className="img-card"
+                                src={item.cardImage}
+                                alt=""
+                                {...provided.draggableProps}
+                                ref={provided.innerRef}
+                                {...provided.dragHandleProps}
+                              />
+                            )}
+                          </Draggable>
+                        ))
+                    : corner2.map((item, index) => (
+                        <Draggable draggableId={item.code} index={index} key={item.code}>
+                          {provided => (
+                            <img
+                              className="img-card"
+                              src={item.cardImage}
+                              alt=""
+                              {...provided.draggableProps}
+                              ref={provided.innerRef}
+                              {...provided.dragHandleProps}
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+
                   {provided.placeholder}
                 </div>
               </div>
             )}
           </Droppable>
+
           <Droppable droppableId="CORNER3" direction="horizontal">
             {provided => (
               <div ref={provided.innerRef} {...provided.droppableProps}>
                 <div className="Corner">
                   <span>Corner 3</span>
                   <br></br>
-                  {corner3
-                    .filter((item, index, corner3) => index === 0 || index === corner3.length - 1)
-                    .map((item, index) => (
-                      <Draggable draggableId={item.code} index={index} key={item.code}>
-                        {provided => (
-                          <img
-                            className="img-card"
-                            src={item.cardImage}
-                            alt=""
-                            {...provided.draggableProps}
-                            ref={provided.innerRef}
-                            {...provided.dragHandleProps}
-                          />
-                        )}
-                      </Draggable>
-                    ))}
+
+                  {expand7 === 'Expand'
+                    ? corner3
+                        .filter((item, index, corner3) => index === 0 || index === corner3.length - 1)
+                        .map((item, index) => (
+                          <Draggable draggableId={item.code} index={index} key={item.code}>
+                            {provided => (
+                              <img
+                                className="img-card"
+                                src={item.cardImage}
+                                alt=""
+                                {...provided.draggableProps}
+                                ref={provided.innerRef}
+                                {...provided.dragHandleProps}
+                              />
+                            )}
+                          </Draggable>
+                        ))
+                    : corner3.map((item, index) => (
+                        <Draggable draggableId={item.code} index={index} key={item.code}>
+                          {provided => (
+                            <img
+                              className="img-card"
+                              src={item.cardImage}
+                              alt=""
+                              {...provided.draggableProps}
+                              ref={provided.innerRef}
+                              {...provided.dragHandleProps}
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+
                   {provided.placeholder}
                 </div>
               </div>
             )}
           </Droppable>
+
           <Droppable droppableId="CORNER4" direction="horizontal">
             {provided => (
               <div ref={provided.innerRef} {...provided.droppableProps}>
                 <div className="Corner">
                   <span>Corner 4</span>
                   <br></br>
-                  {corner4
-                    .filter((item, index, corner4) => index === 0 || index === corner4.length - 1)
-                    .map((item, index) => (
-                      <Draggable draggableId={item.code} index={index} key={item.code}>
-                        {provided => (
-                          <img
-                            className="img-card"
-                            src={item.cardImage}
-                            alt=""
-                            {...provided.draggableProps}
-                            ref={provided.innerRef}
-                            {...provided.dragHandleProps}
-                          />
-                        )}
-                      </Draggable>
-                    ))}
+
+                  {expand8 === 'Expand'
+                    ? corner4
+                        .filter((item, index, corner4) => index === 0 || index === corner4.length - 1)
+                        .map((item, index) => (
+                          <Draggable draggableId={item.code} index={index} key={item.code}>
+                            {provided => (
+                              <img
+                                className="img-card"
+                                src={item.cardImage}
+                                alt=""
+                                {...provided.draggableProps}
+                                ref={provided.innerRef}
+                                {...provided.dragHandleProps}
+                              />
+                            )}
+                          </Draggable>
+                        ))
+                    : corner4.map((item, index) => (
+                        <Draggable draggableId={item.code} index={index} key={item.code}>
+                          {provided => (
+                            <img
+                              className="img-card"
+                              src={item.cardImage}
+                              alt=""
+                              {...provided.draggableProps}
+                              ref={provided.innerRef}
+                              {...provided.dragHandleProps}
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+
                   {provided.placeholder}
                 </div>
               </div>
             )}
           </Droppable>
         </div>
+
         <Droppable droppableId="HAND" direction="horizontal">
           {provided => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
@@ -700,6 +830,7 @@ function App() {
             </div>
           )}
         </Droppable>
+
         <Droppable droppableId="HANDPC" direction="horizontal">
           {provided => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
