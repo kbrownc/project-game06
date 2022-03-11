@@ -159,6 +159,7 @@ function App() {
     (item, index) => {
       let workSelected;
       let workHandPC = handPC.slice();
+      console.log(workHandPC);
       if (item.selected === false) {
         workSelected = true
       } else { 
