@@ -50,7 +50,7 @@ function App() {
         if (data.remaining === 0) {
           console.log('no cards left in deck');
         }
-        let workHand = hand;
+        let workHand = hand.slice();
         let handEntry = {},
           sortKey = 0,
           sortCard = 0;
@@ -59,6 +59,7 @@ function App() {
           cardImage: data.cards[0].image,
           sortKey: workHand.length,
           sortCard: sortCard,
+          selected: false,
           code: data.cards[0].code,
         };
         workHand.push(handEntry);
@@ -153,6 +154,22 @@ function App() {
     [expand1, expand2, expand3, expand4, expand5, expand6, expand7, expand8]
   );
 
+  // Mark current card 'selected'
+  const cardSelected = useCallback(
+    (item, index) => {
+      let workSelected;
+      let workHandPC = handPC.slice();
+      if (item.selected === false) {
+        workSelected = true
+      } else { 
+        workSelected = false
+      }
+      workHandPC[index].selected = workSelected;
+      setHandPC(workHandPC);
+    },
+    [handPC]
+  );
+
   // Calculate sortCard variable
   const calcSortCard = value => {
     let sortCard = 0;
@@ -172,7 +189,6 @@ function App() {
 
   // boardSetup - Get 18 cards from deck and place on board
   const boardSetup = useCallback(() => {
-    console.log('boardSetup');
     fetch(urlGetDraw)
       .then(response => response.json())
       .then(data => {
@@ -192,6 +208,7 @@ function App() {
             cardImage: data.cards[i].image,
             sortKey: i,
             sortCard: sortCard,
+            selected: false,
             code: data.cards[i].code,
           };
           workHand.push(handEntry);
@@ -203,6 +220,7 @@ function App() {
             cardImage: data.cards[i].image,
             sortKey: i,
             sortCard: sortCard,
+            selected: false,
             code: data.cards[i].code,
           };
           workHandPC.push(handEntry);
@@ -214,6 +232,7 @@ function App() {
             cardImage: data.cards[i].image,
             sortKey: i,
             sortCard: sortCard,
+            selected: false,
             code: data.cards[i].code,
           };
           if (i === 14) {
@@ -360,16 +379,16 @@ function App() {
       <span className="Title">Kings Corner</span>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="Nav">
-          <div className="Box Button" style={{ gridColumn: 1, gridRow: 1 }} onClick={onReset}>
+          <div className="Box Button" onClick={onReset}>
             Reset Game
           </div>
-          <div className="Box Button" style={{ gridColumn: 2, gridRow: 1 }} onClick={onDraw}>
+          <div className="Box Button" onClick={onDraw}>
             Draw Card
           </div>
-          <div className="Box Button" style={{ gridColumn: 3, gridRow: 1 }} onClick={onTurn}>
+          <div className="Box Button" onClick={onTurn}>
             Turn Complete
           </div>
-          <div className="Box Button" style={{ gridColumn: 4, gridRow: 1 }} onClick={onAbout}>
+          <div className="Box Button" onClick={onAbout}>
             About
           </div>
         </div>
@@ -841,9 +860,10 @@ function App() {
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
                         <img
-                          className="img-card"
+                          className={`img-card${item.selected ? ' Card' : ''}`}     
                           src={item.cardImage}
                           alt=""
+                          onClick={() => cardSelected(item,index)}
                           {...provided.draggableProps}
                           ref={provided.innerRef}
                           {...provided.dragHandleProps}
