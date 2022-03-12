@@ -156,14 +156,14 @@ function App() {
 
   // Mark current card 'selected'
   const cardSelected = useCallback(
-    (item, index) => {
+    index => {
       let workSelected;
       let workHandPC = handPC.slice();
       console.log(workHandPC);
-      if (item.selected === false) {
-        workSelected = true
-      } else { 
-        workSelected = false
+      if (workHandPC[index].selected === false) {
+        workSelected = true;
+      } else {
+        workSelected = false;
       }
       workHandPC[index].selected = workSelected;
       setHandPC(workHandPC);
@@ -861,10 +861,10 @@ function App() {
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
                         <img
-                          className={`img-card${item.selected ? ' Card' : ''}`}     
+                          className={`img-card${item.selected ? ' Card' : ''}`}
                           src={item.cardImage}
                           alt=""
-                          onClick={() => cardSelected(item,index)}
+                          onClick={() => cardSelected(index)}
                           {...provided.draggableProps}
                           ref={provided.innerRef}
                           {...provided.dragHandleProps}
