@@ -154,23 +154,6 @@ function App() {
     [expand1, expand2, expand3, expand4, expand5, expand6, expand7, expand8]
   );
 
-  // Mark current card 'selected'
-  const cardSelected = useCallback(
-    index => {
-      let workSelected;
-      let workHandPC = handPC.slice();
-      console.log(workHandPC);
-      if (workHandPC[index].selected === false) {
-        workSelected = true;
-      } else {
-        workSelected = false;
-      }
-      workHandPC[index].selected = workSelected;
-      setHandPC(workHandPC);
-    },
-    [handPC]
-  );
-
   // Calculate sortCard variable
   const calcSortCard = value => {
     let sortCard = 0;
@@ -203,6 +186,7 @@ function App() {
           sortKey = 0,
           sortCard = 0;
         let i = 0;
+        // load player's hand
         for (i = 0; i < 7; i++) {
           sortCard = calcSortCard(data.cards[i].value);
           handEntry = {
@@ -214,7 +198,7 @@ function App() {
           };
           workHand.push(handEntry);
         }
-        //  load other (PC's) hand
+        // load computer's hand
         for (i = 7; i < 14; i++) {
           sortCard = calcSortCard(data.cards[i].value);
           handEntry = {
@@ -246,6 +230,7 @@ function App() {
             workSide4.push(handEntry);
           }
         }
+        // update state
         setHand(workHand);
         setHandPC(workHandPC);
         setSidePiles(() => {
@@ -285,71 +270,96 @@ function App() {
     }
     // moving cards within and between your hand and the PCs hand
     let add;
-    let changedHand = hand;
-    let changedHandPC = handPC;
-    let changedCorner1 = corner1,
-      changedCorner2 = corner2,
-      changedCorner3 = corner3,
-      changedCorner4 = corner4;
-    let changedSide1 = side1,
-      changedSide2 = side2,
-      changedSide3 = side3,
-      changedSide4 = side4;
+    let changedHand = JSON.parse(JSON.stringify(hand));
+    let changedHandPC = JSON.parse(JSON.stringify(handPC));
+    let changedCorner1 = JSON.parse(JSON.stringify(corner1)),
+      changedCorner2 = JSON.parse(JSON.stringify(corner2)),
+      changedCorner3 = JSON.parse(JSON.stringify(corner3)),
+      changedCorner4 = JSON.parse(JSON.stringify(corner4));
+    let changedSide1 = JSON.parse(JSON.stringify(side1)),
+      changedSide2 = JSON.parse(JSON.stringify(side2)),
+      changedSide3 = JSON.parse(JSON.stringify(side3)),
+      changedSide4 = JSON.parse(JSON.stringify(side4));
     // Source Logic - remove card
     if (source.droppableId === 'HAND') {
-      add = changedHand[source.index];
+      add = changedHand.slice(source.index,source.index + 1);
       changedHand.splice(source.index, 1);
     } else if (source.droppableId === 'HANDPC') {
-      add = changedHandPC[source.index];
+      add = changedHandPC.slice(source.index,source.index + 1);
       changedHandPC.splice(source.index, 1);
-    } else if (source.droppableId === 'CORNER1') {
-      add = changedCorner1[changedCorner1.length - 1];
+    } else if (source.droppableId === 'CORNER1' && source.index === 0) {
+      add = changedCorner1.slice();
+      changedCorner1.splice(0, changedCorner1.length);
+    } else if (source.droppableId === 'CORNER1' && source.index === 1) {
+      add = changedCorner1.slice(changedCorner1.length - 1);
       changedCorner1.splice(changedCorner1.length - 1, 1);
-    } else if (source.droppableId === 'CORNER2') {
-      add = changedCorner2[changedCorner2.length - 1];
+    } else if (source.droppableId === 'CORNER2' && source.index === 0) {
+      add = changedCorner2.slice();
+      changedCorner2.splice(0, changedCorner2.length);
+    } else if (source.droppableId === 'CORNER2' && source.index === 1) {
+      add = changedCorner2.slice(changedCorner2.length - 1);
       changedCorner2.splice(changedCorner2.length - 1, 1);
-    } else if (source.droppableId === 'CORNER3') {
-      add = changedCorner3[changedCorner3.length - 1];
+    } else if (source.droppableId === 'CORNER3' && source.index === 0) {
+      add = changedCorner3.slice();
+      changedCorner3.splice(0, changedCorner3.length);
+    } else if (source.droppableId === 'CORNER3' && source.index === 1) {
+      add = changedCorner3.slice(changedCorner3.length - 1);
       changedCorner3.splice(changedCorner3.length - 1, 1);
-    } else if (source.droppableId === 'CORNER4') {
-      add = changedCorner4[changedCorner4.length - 1];
+    } else if (source.droppableId === 'CORNER4' && source.index === 0) {
+      add = changedCorner4.slice();
+      changedCorner4.splice(0, changedCorner4.length);
+    } else if (source.droppableId === 'CORNER4' && source.index === 1) {
+      add = changedCorner4.slice(changedCorner4.length - 1);
       changedCorner4.splice(changedCorner4.length - 1, 1);
-    } else if (source.droppableId === 'SIDE1') {
-      add = changedSide1[changedSide1.length - 1];
+    } else if (source.droppableId === 'SIDE1' && source.index === 0) {
+      add = changedSide1.slice();
+      changedSide1.splice(0, changedSide1.length);
+    } else if (source.droppableId === 'SIDE1' && source.index === 1) {
+      add = changedSide1.slice(changedSide1.length - 1);
       changedSide1.splice(changedSide1.length - 1, 1);
-    } else if (source.droppableId === 'SIDE2') {
-      add = changedSide2[changedSide2.length - 1];
+    } else if (source.droppableId === 'SIDE2' && source.index === 0) {
+      add = changedSide2.slice();
+      changedSide2.splice(0, changedSide2.length);
+    } else if (source.droppableId === 'SIDE2' && source.index === 1) {
+      add = changedSide2.slice(changedSide2.length - 1);
       changedSide2.splice(changedSide2.length - 1, 1);
-    } else if (source.droppableId === 'SIDE3') {
-      add = changedSide3[changedSide3.length - 1];
+    } else if (source.droppableId === 'SIDE3' && source.index === 0) {
+      add = changedSide3.slice();
+      changedSide3.splice(0, changedSide3.length);
+    } else if (source.droppableId === 'SIDE3' && source.index === 1) {
+      add = changedSide3.slice(changedSide3.length - 1);
       changedSide3.splice(changedSide3.length - 1, 1);
-    } else if (source.droppableId === 'SIDE4') {
-      add = changedSide4[changedSide4.length - 1];
+    } else if (source.droppableId === 'SIDE4' && source.index === 0) {
+      add = changedSide4.slice();
+      changedSide4.splice(0, changedSide4.length);
+    } else if (source.droppableId === 'SIDE4' && source.index === 1) {
+      add = changedSide4.slice(changedSide4.length - 1);
       changedSide4.splice(changedSide4.length - 1, 1);
     }
 
     // Destination Logic
     if (destination.droppableId === 'HAND') {
-      changedHand.splice(destination.index, 0, add);
+      changedHand.splice(destination.index, 0, ...add);
     } else if (destination.droppableId === 'HANDPC') {
-      changedHandPC.splice(destination.index, 0, add);
+      changedHandPC.splice(destination.index, 0, ...add);
     } else if (destination.droppableId === 'CORNER1') {
-      changedCorner1.splice(changedCorner1.length, 0, add);
+      changedCorner1.splice(changedCorner1.length, 0, ...add);
     } else if (destination.droppableId === 'CORNER2') {
-      changedCorner2.splice(changedCorner2.length, 0, add);
+      changedCorner2.splice(changedCorner2.length, 0, ...add);
     } else if (destination.droppableId === 'CORNER3') {
-      changedCorner3.splice(changedCorner3.length, 0, add);
+      changedCorner3.splice(changedCorner3.length, 0, ...add);
     } else if (destination.droppableId === 'CORNER4') {
-      changedCorner4.splice(changedCorner4.length, 0, add);
+      changedCorner4.splice(changedCorner4.length, 0, ...add);
     } else if (destination.droppableId === 'SIDE1') {
-      changedSide1.splice(changedSide1.length, 0, add);
+      changedSide1.splice(changedSide1.length, 0, ...add);
     } else if (destination.droppableId === 'SIDE2') {
-      changedSide2.splice(changedSide2.length, 0, add);
+      changedSide2.splice(changedSide2.length, 0, ...add);
     } else if (destination.droppableId === 'SIDE3') {
-      changedSide3.splice(changedSide3.length, 0, add);
+      changedSide3.splice(changedSide3.length, 0, ...add);
     } else if (destination.droppableId === 'SIDE4') {
-      changedSide4.splice(changedSide4.length, 0, add);
+      changedSide4.splice(changedSide4.length, 0, ...add);
     }
+    // update state
     setHandPC(changedHandPC);
     setHand(changedHand);
     setCornerPiles(() => {
@@ -370,8 +380,8 @@ function App() {
     });
   };
 
-  // The following 'if' statement is to stop an initial render error.
-  //    UseEffect is executed after an initial render.
+  // The following 'if' statement is to stop an initial render error
+  //    as UseEffect is not executed until after an initial render.
   if (hand === undefined || handPC === undefined) return null;
   //
   // RETURN
@@ -861,10 +871,9 @@ function App() {
                     <Draggable draggableId={item.code} index={index} key={item.code}>
                       {provided => (
                         <img
-                          className={`img-card${item.selected ? ' Card' : ''}`}
+                          className="img-card"
                           src={item.cardImage}
                           alt=""
-                          onClick={() => cardSelected(index)}
                           {...provided.draggableProps}
                           ref={provided.innerRef}
                           {...provided.dragHandleProps}
