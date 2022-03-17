@@ -8,21 +8,16 @@ function App() {
   const urlGetDraw = 'https://deckofcardsapi.com/api/deck/new/draw/?count=18';
 
   // State
-  const [{ message }, setGameState] = useState({
-    message: 'Draw card',
-  });
-  const [{ side1, side2, side3, side4 }, setSidePiles] = useState({
-    side1: [],
-    side2: [],
-    side3: [],
-    side4: [],
-  });
-  const [{ corner1, corner2, corner3, corner4 }, setCornerPiles] = useState({
-    corner1: [],
-    corner2: [],
-    corner3: [],
-    corner4: [],
-  });
+  const [message, setMessage] = useState('Draw card');
+  const [side1, setSide1] = useState([]);
+  const [side2, setSide2] = useState([]);
+  const [side3, setSide3] = useState([]);
+  const [side4, setSide4] = useState([]);
+    
+  const [corner1, setCorner1] = useState([]);
+  const [corner2, setCorner2] = useState([]);
+  const [corner3, setCorner3] = useState([]);
+  const [corner4, setCorner4] = useState([]);
   const [deckId, setDeckId] = useState('');
   const [hand, setHand] = useState();
   const [handPC, setHandPC] = useState();
@@ -62,13 +57,26 @@ function App() {
         };
         workHand.push(handEntry);
         setHand(workHand);
-        setGameState(() => {
-          return {
-            message: 'Card drawn',
-          };
-        });
+        setMessage('Card drawn');
       });
   }, [deckId, hand]);
+
+  // Move a card
+  const moveCard = (sourcePile, sourceIndex, targetPile, targetIndex) => {
+    let workMessage = 'card moved';
+    console.log('moveCard',);
+    if (sourcePile === 'handPC') {
+      if (targetPile === 'corner1') {
+        let changedHandPC = hand.slice();
+        let changedCorner1 = corner1.slice();
+        changedHandPC.splice(sourceIndex, 1);
+        setHandPC(changedHandPC);
+
+        setCorner1(changedCorner1);
+      }
+    }
+    return workMessage;
+  };
 
   // drawCard - Get 1 card from deck and place on handPC
   const drawCard = useCallback(() => {
@@ -83,7 +91,6 @@ function App() {
         let handEntry = {},
           sortKey = 0,
           sortCard = 0;
-        console.log('data',data);
         sortCard = calcSortCard(data.cards[0].value);
         handEntry = {
           cardImage: data.cards[0].image,
@@ -93,11 +100,7 @@ function App() {
         };
         workHandPC.push(handEntry);
         setHandPC(workHandPC);
-        setGameState(() => {
-          return {
-            message: 'Draw card',
-          };
-        });
+        setMessage('Draw card');
       });
   }, [handPC,deckId]);
 
@@ -108,14 +111,16 @@ function App() {
     //       Draw Card
     //      If K is in handPC, move to available corner
     drawCard();
-    let i= -1;
+    let i= 0;
     let positionKing = 0;
+    console.log('handPC',handPC);
     while (i < handPC.length) {
-        i++;
         positionKing = handPC[i].code.indexOf("K");
         if (positionKing !== -1) break;
+        i++;
     };
     console.log('position  of King found',i);
+    moveCard('handPC', i, 'corner1', 0);
     //  b) Check to see if a card can be moved to Side1-4 or Corner1-4
     //        If yes, move card and Check for end of game
     //  c) Check to see if entire Side1-4 piles can be moved to corner1-4 or to other Side1-4
@@ -123,21 +128,13 @@ function App() {
     //     Redo c)
     //  d) Set message to indicate it is player's turn
     //
-    setGameState(() => {
-      return {
-        message: 'Draw card',
-      };
-    });
-  }, [handPC,deckId, drawCard]);
+    setMessage('Draw card');
+  }, [handPC,drawCard,moveCard]);
 
   // About the game
   const onAbout = useCallback(() => {
     alert('How to play the game');
-    setGameState(() => {
-      return {
-        message: 'Draw card',
-      };
-    });
+    setMessage('Draw card');
   }, []);
 
   // Expand card pile
@@ -192,11 +189,7 @@ function App() {
           setExpand8('Expand');
         }
       }
-      setGameState(() => {
-        return {
-          message: 'Card pile expanded',
-        };
-      });
+      setMessage('Card pile Expanded');
     },
     [expand1, expand2, expand3, expand4, expand5, expand6, expand7, expand8]
   );
@@ -277,20 +270,12 @@ function App() {
         // update state
         setHand(workHand);
         setHandPC(workHandPC);
-        setSidePiles(() => {
-          return {
-            side1: workSide1,
-            side2: workSide2,
-            side3: workSide3,
-            side4: workSide4,
-          };
-        });
+        setSide1(workSide1);
+        setSide2(workSide2);
+        setSide3(workSide3);
+        setSide4(workSide4);
         setDeckId(data.deck_id);
-        setGameState(() => {
-          return {
-            message: 'Draw card',
-          };
-        });
+        setMessage('Draw card');
       });
   }, []);
 
@@ -406,22 +391,14 @@ function App() {
     // update state
     setHandPC(changedHandPC);
     setHand(changedHand);
-    setCornerPiles(() => {
-      return {
-        corner1: changedCorner1,
-        corner2: changedCorner2,
-        corner3: changedCorner3,
-        corner4: changedCorner4,
-      };
-    });
-    setSidePiles(() => {
-      return {
-        side1: changedSide1,
-        side2: changedSide2,
-        side3: changedSide3,
-        side4: changedSide4,
-      };
-    });
+    setCorner1(changedCorner1);
+    setCorner2(changedCorner2);
+    setCorner3(changedCorner3);
+    setCorner4(changedCorner4);
+    setSide1(changedSide1);
+    setSide2(changedSide2);
+    setSide3(changedSide3);
+    setSide4(changedSide4);
   };
 
   // The following 'if' statement is to stop an initial render error
