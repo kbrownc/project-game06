@@ -37,7 +37,6 @@ function App() {
 
   // Reset game
   const onReset = useCallback(() => {
-    console.log('Reset');
     boardSetup();
   }, []);
 
@@ -59,7 +58,6 @@ function App() {
           cardImage: data.cards[0].image,
           sortKey: workHand.length,
           sortCard: sortCard,
-          selected: false,
           code: data.cards[0].code,
         };
         workHand.push(handEntry);
@@ -72,19 +70,68 @@ function App() {
       });
   }, [deckId, hand]);
 
+  // drawCard - Get 1 card from deck and place on handPC
+  const drawCard = useCallback(() => {
+    let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
+    fetch(urlDrawHand2)
+      .then(response => response.json())
+      .then(data => {
+        if (data.remaining === 0) {
+          console.log('no cards left in deck');
+        }
+        let workHandPC = handPC.slice();
+        let handEntry = {},
+          sortKey = 0,
+          sortCard = 0;
+        console.log('data',data);
+        sortCard = calcSortCard(data.cards[0].value);
+        handEntry = {
+          cardImage: data.cards[0].image,
+          sortKey: workHandPC.length,
+          sortCard: sortCard,
+          code: data.cards[0].code,
+        };
+        workHandPC.push(handEntry);
+        setHandPC(workHandPC);
+        setGameState(() => {
+          return {
+            message: 'Draw card',
+          };
+        });
+      });
+  }, [handPC,deckId]);
+
   // Turn complete
   const onTurn = useCallback(() => {
-    console.log('Computer now plays');
+    // a) Draw Card
+    //    Loop until no K's in handPC 
+    //       Draw Card
+    //      If K is in handPC, move to available corner
+    drawCard();
+    let i= -1;
+    let positionKing = 0;
+    while (i < handPC.length) {
+        i++;
+        positionKing = handPC[i].code.indexOf("K");
+        if (positionKing !== -1) break;
+    };
+    console.log('position  of King found',i);
+    //  b) Check to see if a card can be moved to Side1-4 or Corner1-4
+    //        If yes, move card and Check for end of game
+    //  c) Check to see if entire Side1-4 piles can be moved to corner1-4 or to other Side1-4
+    //        If yes, play a card(s) on any empty sides and Check for end of game
+    //     Redo c)
+    //  d) Set message to indicate it is player's turn
+    //
     setGameState(() => {
       return {
         message: 'Draw card',
       };
     });
-  }, []);
+  }, [handPC,deckId, drawCard]);
 
   // About the game
   const onAbout = useCallback(() => {
-    console.log('About');
     alert('How to play the game');
     setGameState(() => {
       return {
@@ -193,7 +240,6 @@ function App() {
             cardImage: data.cards[i].image,
             sortKey: i,
             sortCard: sortCard,
-            selected: false,
             code: data.cards[i].code,
           };
           workHand.push(handEntry);
@@ -205,7 +251,6 @@ function App() {
             cardImage: data.cards[i].image,
             sortKey: i,
             sortCard: sortCard,
-            selected: false,
             code: data.cards[i].code,
           };
           workHandPC.push(handEntry);
@@ -217,7 +262,6 @@ function App() {
             cardImage: data.cards[i].image,
             sortKey: i,
             sortCard: sortCard,
-            selected: false,
             code: data.cards[i].code,
           };
           if (i === 14) {
