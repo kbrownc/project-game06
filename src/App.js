@@ -64,16 +64,35 @@ function App() {
   // Move a card
   const moveCard = (sourcePile, sourceIndex, targetPile, targetIndex) => {
     let workMessage = 'card moved';
-    console.log('moveCard',);
+    console.log('moveCard',sourcePile, sourceIndex, targetPile, targetIndex);
     if (sourcePile === 'handPC') {
       if (targetPile === 'corner1') {
-        let changedHandPC = hand.slice();
+        let changedHandPC = handPC.slice();
         let changedCorner1 = corner1.slice();
+        let add = changedHandPC.slice(sourceIndex,sourceIndex + 1);
         changedHandPC.splice(sourceIndex, 1);
+        console.log('add',add);
+        changedCorner1.splice(changedCorner1.length, 0, ...add);
         setHandPC(changedHandPC);
-
+        console.log('changedHandPC',changedHandPC);
         setCorner1(changedCorner1);
+        setHandPC(changedHandPC);
       }
+      // still need to add if's for other corner piles =================================
+    }
+    return workMessage;
+  };
+
+  // End of Game Check
+  const endOfGameCheck = () => {
+    let workMessage = '';
+    if (handPC.length === 0) {
+      workMessage = 'end of game';
+      console.log('end of game');
+    }
+    else {
+      workMessage = 'draw a card';
+      console.log('NOT end of game');
     }
     return workMessage;
   };
@@ -119,10 +138,23 @@ function App() {
         if (positionKing !== -1) break;
         i++;
     };
-    console.log('position  of King found',i);
-    moveCard('handPC', i, 'corner1', 0);
+    if (positionKing !== -1) {
+      if (corner1.length === 0) {
+        moveCard('handPC', i, 'corner1', 0)
+      } else if (corner2.length === 0) {
+        moveCard('handPC', i, 'corner2', 0)
+      } else if (corner3.length === 0) {
+        moveCard('handPC', i, 'corner3', 0)
+      } else {
+        moveCard('handPC', i, 'corner4', 0)
+      }
+    }
+    else {
+      console.log('no King found')
+    };
     //  b) Check to see if a card can be moved to Side1-4 or Corner1-4
     //        If yes, move card and Check for end of game
+    endOfGameCheck();
     //  c) Check to see if entire Side1-4 piles can be moved to corner1-4 or to other Side1-4
     //        If yes, play a card(s) on any empty sides and Check for end of game
     //     Redo c)
