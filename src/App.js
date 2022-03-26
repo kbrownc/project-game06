@@ -13,7 +13,7 @@ function App() {
   const [side2, setSide2] = useState([]);
   const [side3, setSide3] = useState([]);
   const [side4, setSide4] = useState([]);
-    
+
   const [corner1, setCorner1] = useState([]);
   const [corner2, setCorner2] = useState([]);
   const [corner3, setCorner3] = useState([]);
@@ -42,45 +42,39 @@ function App() {
       .then(response => response.json())
       .then(data => {
         if (data.remaining === 0) {
-          console.log('no cards left in deck');
+          console.error('no cards left in deck');
         }
-        let workHand = hand.slice();
+        let changedHand = hand.slice();
         let handEntry = {},
           sortKey = 0,
           sortCard = 0;
         sortCard = calcSortCard(data.cards[0].value);
         handEntry = {
           cardImage: data.cards[0].image,
-          sortKey: workHand.length,
+          sortKey: changedHand.length,
           sortCard: sortCard,
           code: data.cards[0].code,
         };
-        workHand.push(handEntry);
-        setHand(workHand);
+        changedHand.push(handEntry);
+        setHand(changedHand);
         setMessage('Card drawn');
       });
   }, [deckId, hand]);
 
   // Move a card
-  const moveCard = (sourcePile, sourceIndex, targetPile, targetIndex) => {
-    let workMessage = 'card moved';
-    console.log('moveCard',sourcePile, sourceIndex, targetPile, targetIndex);
+  const moveCard = (sourcePile, sourceIndex, targetPile, targetIndex, changedHandPC) => {
+    console.log('moveCard', sourcePile, sourceIndex, targetPile, targetIndex, changedHandPC);
     if (sourcePile === 'handPC') {
       if (targetPile === 'corner1') {
-        let changedHandPC = handPC.slice();
         let changedCorner1 = corner1.slice();
-        let add = changedHandPC.slice(sourceIndex,sourceIndex + 1);
+        let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
         changedHandPC.splice(sourceIndex, 1);
-        console.log('add',add);
         changedCorner1.splice(changedCorner1.length, 0, ...add);
-        setHandPC(changedHandPC);
-        console.log('changedHandPC',changedHandPC);
         setCorner1(changedCorner1);
-        setHandPC(changedHandPC);
       }
       // still need to add if's for other corner piles =================================
     }
-    return workMessage;
+    return changedHandPC;
   };
 
   // End of Game Check
@@ -88,11 +82,10 @@ function App() {
     let workMessage = '';
     if (handPC.length === 0) {
       workMessage = 'end of game';
-      console.log('end of game');
-    }
-    else {
+      console.error('end of game');
+    } else {
       workMessage = 'draw a card';
-      console.log('NOT end of game');
+      console.error('NOT end of game');
     }
     return workMessage;
   };
@@ -104,54 +97,55 @@ function App() {
       .then(response => response.json())
       .then(data => {
         if (data.remaining === 0) {
-          console.log('no cards left in deck');
+          console.error('no cards left in deck');
         }
-        let workHandPC = handPC.slice();
+        let changedHandPC = handPC.slice();
+        console.log('drawCard 1 changedHandPC', changedHandPC);
         let handEntry = {},
           sortKey = 0,
           sortCard = 0;
         sortCard = calcSortCard(data.cards[0].value);
         handEntry = {
           cardImage: data.cards[0].image,
-          sortKey: workHandPC.length,
+          sortKey: changedHandPC.length,
           sortCard: sortCard,
           code: data.cards[0].code,
         };
-        workHandPC.push(handEntry);
-        setHandPC(workHandPC);
+        changedHandPC.push(handEntry);
         setMessage('Draw card');
+        console.log('drawCard 2 changedHandPC', changedHandPC);
+        return changedHandPC;
       });
-  }, [handPC,deckId]);
+  }, [handPC, deckId]);
 
   // Turn complete
   const onTurn = useCallback(() => {
     // a) Draw Card
-    //    Loop until no K's in handPC 
+    //    Loop until no K's in handPC
     //       Draw Card
     //      If K is in handPC, move to available corner
-    drawCard();
-    let i= 0;
+    let changedHandPC = drawCard();
+    console.log('onTurn drawCard changedHandPC', changedHandPC);
+    let i = 0;
     let positionKing = 0;
-    console.log('handPC',handPC);
     while (i < handPC.length) {
-        positionKing = handPC[i].code.indexOf("K");
-        if (positionKing !== -1) break;
-        i++;
-    };
+      positionKing = handPC[i].code.indexOf('K');
+      if (positionKing !== -1) break;
+      i++;
+    }
     if (positionKing !== -1) {
       if (corner1.length === 0) {
-        moveCard('handPC', i, 'corner1', 0)
+        moveCard('handPC', i, 'corner1', 0, changedHandPC);
       } else if (corner2.length === 0) {
-        moveCard('handPC', i, 'corner2', 0)
+        moveCard('handPC', i, 'corner2', 0, changedHandPC);
       } else if (corner3.length === 0) {
-        moveCard('handPC', i, 'corner3', 0)
+        moveCard('handPC', i, 'corner3', 0, changedHandPC);
       } else {
-        moveCard('handPC', i, 'corner4', 0)
+        moveCard('handPC', i, 'corner4', 0, changedHandPC);
       }
+    } else {
+      console.log('no King found');
     }
-    else {
-      console.log('no King found')
-    };
     //  b) Check to see if a card can be moved to Side1-4 or Corner1-4
     //        If yes, move card and Check for end of game
     endOfGameCheck();
@@ -161,7 +155,8 @@ function App() {
     //  d) Set message to indicate it is player's turn
     //
     setMessage('Draw card');
-  }, [handPC,drawCard,moveCard]);
+    setHandPC(changedHandPC);
+  }, [handPC, drawCard, moveCard]);
 
   // About the game
   const onAbout = useCallback(() => {
@@ -343,10 +338,10 @@ function App() {
       changedSide4 = JSON.parse(JSON.stringify(side4));
     // Source Logic - remove card
     if (source.droppableId === 'HAND') {
-      add = changedHand.slice(source.index,source.index + 1);
+      add = changedHand.slice(source.index, source.index + 1);
       changedHand.splice(source.index, 1);
     } else if (source.droppableId === 'HANDPC') {
-      add = changedHandPC.slice(source.index,source.index + 1);
+      add = changedHandPC.slice(source.index, source.index + 1);
       changedHandPC.splice(source.index, 1);
     } else if (source.droppableId === 'CORNER1' && source.index === 0) {
       add = changedCorner1.slice();
@@ -437,7 +432,6 @@ function App() {
   //    as UseEffect is not executed until after an initial render.
   if (hand === undefined || handPC === undefined) return null;
   //
-  // RETURN
   return (
     <div className="Container">
       <span className="Title">Kings Corner</span>
