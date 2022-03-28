@@ -111,13 +111,14 @@ function App() {
   // drawCard - Get 1 card from deck and place on handPC
   const drawCard = useCallback(() => {
     let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
+    let changedHandPC = handPC.slice();;
     fetch(urlDrawHand2)
       .then(response => response.json())
       .then(data => {
         if (data.remaining === 0) {
           console.error('no cards left in deck');
         }
-        let changedHandPC = handPC.slice();
+        //let changedHandPC = handPC.slice();
         console.log('drawCard 1 changedHandPC', changedHandPC);
         let handEntry = {},
           sortKey = 0,
@@ -134,6 +135,7 @@ function App() {
         console.log('drawCard 2 changedHandPC', changedHandPC);
         return ( changedHandPC )
       });
+      return ( changedHandPC )
   }, [handPC, deckId]);
 
   // Turn complete
