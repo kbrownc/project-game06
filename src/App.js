@@ -69,12 +69,30 @@ function App() {
         let changedCorner1 = corner1.slice();
         let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
         changedHandPC.splice(sourceIndex, 1);
+        console.log('moveCard changedHandPC',changedHandPC);
         changedCorner1.splice(changedCorner1.length, 0, ...add);
         setCorner1(changedCorner1);
+      } else if (targetPile === 'corner2') {
+        let changedCorner2 = corner2.slice();
+        let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
+        changedHandPC.splice(sourceIndex, 1);
+        changedCorner2.splice(changedCorner2.length, 0, ...add);
+        setCorner2(changedCorner2);
+      } else if (targetPile === 'corner3') {
+        let changedCorner3 = corner3.slice();
+        let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
+        changedHandPC.splice(sourceIndex, 1);
+        changedCorner3.splice(changedCorner3.length, 0, ...add);
+        setCorner3(changedCorner3);
+      } else {
+        let changedCorner4 = corner4.slice();
+        let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
+        changedHandPC.splice(sourceIndex, 1);
+        changedCorner4.splice(changedCorner4.length, 0, ...add);
+        setCorner4(changedCorner4);
       }
-      // still need to add if's for other corner piles =================================
     }
-    return changedHandPC;
+    return ( changedHandPC );
   };
 
   // End of Game Check
@@ -114,18 +132,18 @@ function App() {
         changedHandPC.push(handEntry);
         setMessage('Draw card');
         console.log('drawCard 2 changedHandPC', changedHandPC);
-        return changedHandPC;
+        return ( changedHandPC )
       });
   }, [handPC, deckId]);
 
   // Turn complete
-  const onTurn = useCallback(() => {
+  const onTurnDone = useCallback(() => {
     // a) Draw Card
     //    Loop until no K's in handPC
     //       Draw Card
     //      If K is in handPC, move to available corner
     let changedHandPC = drawCard();
-    console.log('onTurn drawCard changedHandPC', changedHandPC);
+    console.log('onTurnDone after drawCard changedHandPC', changedHandPC);
     let i = 0;
     let positionKing = 0;
     while (i < handPC.length) {
@@ -136,6 +154,7 @@ function App() {
     if (positionKing !== -1) {
       if (corner1.length === 0) {
         moveCard('handPC', i, 'corner1', 0, changedHandPC);
+        console.log('onTurnDone after moveCard changedHandPC', changedHandPC);
       } else if (corner2.length === 0) {
         moveCard('handPC', i, 'corner2', 0, changedHandPC);
       } else if (corner3.length === 0) {
@@ -443,7 +462,7 @@ function App() {
           <div className="Box Button" onClick={onDraw}>
             Draw Card
           </div>
-          <div className="Box Button" onClick={onTurn}>
+          <div className="Box Button" onClick={onTurnDone}>
             Turn Complete
           </div>
           <div className="Box Button" onClick={onAbout}>
