@@ -63,7 +63,7 @@ function App() {
 
   // Move a card
   const moveCard = (sourcePile, sourceIndex, targetPile, targetIndex, changedHandPC) => {
-    console.log('moveCard', sourcePile, sourceIndex, targetPile, targetIndex, changedHandPC);
+    // console.log('moveCard', sourcePile, sourceIndex, targetPile, targetIndex, changedHandPC);
     if (sourcePile === 'handPC') {
       if (targetPile === 'corner1') {
         let changedCorner1 = corner1.slice();
@@ -117,9 +117,7 @@ function App() {
       .then(data => {
         if (data.remaining === 0) {
           console.error('no cards left in deck');
-        }
-        //let changedHandPC = handPC.slice();
-        console.log('drawCard 1 changedHandPC', changedHandPC);
+        }       
         let handEntry = {},
           sortKey = 0,
           sortCard = 0;
@@ -132,40 +130,40 @@ function App() {
         };
         changedHandPC.push(handEntry);
         setMessage('Draw card');
-        console.log('drawCard 2 changedHandPC', changedHandPC);
         return ( changedHandPC )
       });
       return ( changedHandPC )
   }, [handPC, deckId]);
 
-  // Turn complete
+  // Turn complete - Computer's turn
   const onTurnDone = useCallback(() => {
-    // a) Draw Card
-    //    Loop until no K's in handPC
-    //       Draw Card
-    //      If K is in handPC, move to available corner
+    // Draw Card
     let changedHandPC = drawCard();
-    console.log('onTurnDone after drawCard changedHandPC', changedHandPC);
+    // Loop until no King's in handPC
+    // If King is found in handPC, move to next available corner and Draw Card
     let i = 0;
-    let positionKing = 0;
-    while (i < handPC.length) {
-      positionKing = handPC[i].code.indexOf('K');
-      if (positionKing !== -1) break;
-      i++;
-    }
-    if (positionKing !== -1) {
-      if (corner1.length === 0) {
-        moveCard('handPC', i, 'corner1', 0, changedHandPC);
-        console.log('onTurnDone after moveCard changedHandPC', changedHandPC);
-      } else if (corner2.length === 0) {
-        moveCard('handPC', i, 'corner2', 0, changedHandPC);
-      } else if (corner3.length === 0) {
-        moveCard('handPC', i, 'corner3', 0, changedHandPC);
-      } else {
-        moveCard('handPC', i, 'corner4', 0, changedHandPC);
+    for (i = 0; i < changedHandPC.length; i++) {
+      let kingPresent = 0;
+      while (i < changedHandPC.length) {
+        kingPresent = handPC[i].code.indexOf('K');
+        if (kingPresent !== -1) break;
+        i++;
       }
-    } else {
-      console.log('no King found');
+      // King Found
+      if (kingPresent !== -1) {
+        changedHandPC = drawCard();
+        if (corner1.length === 0) {
+          moveCard('handPC', i, 'corner1', 0, changedHandPC);
+        } else if (corner2.length === 0) {
+          moveCard('handPC', i, 'corner2', 0, changedHandPC);
+        } else if (corner3.length === 0) {
+          moveCard('handPC', i, 'corner3', 0, changedHandPC);
+        } else {
+          moveCard('handPC', i, 'corner4', 0, changedHandPC);
+        }
+      } else {
+        console.log('no King found');
+      }
     }
     //  b) Check to see if a card can be moved to Side1-4 or Corner1-4
     //        If yes, move card and Check for end of game
