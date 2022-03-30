@@ -62,37 +62,39 @@ function App() {
   }, [deckId, hand]);
 
   // Move a card
-  const moveCard = (sourcePile, sourceIndex, targetPile, targetIndex, changedHandPC) => {
+  const moveCard = (
+    sourcePile,
+    sourceIndex,
+    targetPile,
+    targetIndex,
+    changedHandPC,
+    changedCorner1,
+    changedCorner2,
+    changedCorner3,
+    changedCorner4
+  ) => {
     // console.log('moveCard', sourcePile, sourceIndex, targetPile, targetIndex, changedHandPC);
     if (sourcePile === 'handPC') {
       if (targetPile === 'corner1') {
-        let changedCorner1 = corner1.slice();
         let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
         changedHandPC.splice(sourceIndex, 1);
-        console.log('moveCard changedHandPC',changedHandPC);
+        console.log('moveCard changedHandPC card removed', changedHandPC);
         changedCorner1.splice(changedCorner1.length, 0, ...add);
-        setCorner1(changedCorner1);
+        console.log('moveCard changedCorner1 card added', changedCorner1);
       } else if (targetPile === 'corner2') {
-        let changedCorner2 = corner2.slice();
         let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
         changedHandPC.splice(sourceIndex, 1);
         changedCorner2.splice(changedCorner2.length, 0, ...add);
-        setCorner2(changedCorner2);
       } else if (targetPile === 'corner3') {
-        let changedCorner3 = corner3.slice();
         let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
         changedHandPC.splice(sourceIndex, 1);
         changedCorner3.splice(changedCorner3.length, 0, ...add);
-        setCorner3(changedCorner3);
       } else {
-        let changedCorner4 = corner4.slice();
         let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
         changedHandPC.splice(sourceIndex, 1);
         changedCorner4.splice(changedCorner4.length, 0, ...add);
-        setCorner4(changedCorner4);
       }
     }
-    return ( changedHandPC );
   };
 
   // End of Game Check
@@ -109,64 +111,114 @@ function App() {
   };
 
   // drawCard - Get 1 card from deck and place on handPC
-  const drawCard = useCallback(() => {
-    let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
-    let changedHandPC = handPC.slice();;
-    fetch(urlDrawHand2)
-      .then(response => response.json())
-      .then(data => {
-        if (data.remaining === 0) {
-          console.error('no cards left in deck');
-        }       
-        let handEntry = {},
-          sortKey = 0,
-          sortCard = 0;
-        sortCard = calcSortCard(data.cards[0].value);
-        handEntry = {
-          cardImage: data.cards[0].image,
-          sortKey: changedHandPC.length,
-          sortCard: sortCard,
-          code: data.cards[0].code,
-        };
-        changedHandPC.push(handEntry);
-        setMessage('Draw card');
-        return ( changedHandPC )
-      });
-      return ( changedHandPC )
-  }, [handPC, deckId]);
+  const drawCard = useCallback(
+    changedHandPC => {
+      let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
+      console.log('drawCard changedHandPC top', changedHandPC);
+      fetch(urlDrawHand2)
+        .then(response => response.json())
+        .then(data => {
+          if (data.remaining === 0) {
+            console.error('no cards left in deck');
+          }
+          let handEntry = {},
+            sortKey = 0,
+            sortCard = 0;
+          sortCard = calcSortCard(data.cards[0].value);
+          handEntry = {
+            cardImage: data.cards[0].image,
+            sortKey: changedHandPC.length,
+            sortCard: sortCard,
+            code: data.cards[0].code,
+          };
+          console.log('drawCard changedHandPC card added-before', changedHandPC);
+          changedHandPC.push(handEntry);
+          console.log('drawCard changedHandPC card added-after', changedHandPC);
+          setMessage('Draw card');
+          return changedHandPC;
+        });
+      return changedHandPC;
+    },
+    [deckId]
+  );
 
-  // Turn complete - Computer's turn
+  // Player's Turn complete - Computer's turn
   const onTurnDone = useCallback(() => {
+    let changedHandPC = handPC.slice();
+    let changedCorner1 = corner1.slice();
+    let changedCorner2 = corner2.slice();
+    let changedCorner3 = corner3.slice();
+    let changedCorner4 = corner4.slice();
     // Draw Card
-    let changedHandPC = drawCard();
+    changedHandPC = drawCard(changedHandPC);
+    console.log('card drawn', changedHandPC);
+    console.log('**** card drawn', drawCard(changedHandPC));
     // Loop until no King's in handPC
     // If King is found in handPC, move to next available corner and Draw Card
     let i = 0;
+    let kingPresent = 0;
     for (i = 0; i < changedHandPC.length; i++) {
-      let kingPresent = 0;
-      while (i < changedHandPC.length) {
-        kingPresent = handPC[i].code.indexOf('K');
-        if (kingPresent !== -1) break;
-        i++;
-      }
-      // King Found
+      console.log('for loop i', i, changedHandPC[i].code);
+      kingPresent = changedHandPC[i].code.indexOf('K');
       if (kingPresent !== -1) {
-        changedHandPC = drawCard();
-        if (corner1.length === 0) {
-          moveCard('handPC', i, 'corner1', 0, changedHandPC);
-        } else if (corner2.length === 0) {
-          moveCard('handPC', i, 'corner2', 0, changedHandPC);
-        } else if (corner3.length === 0) {
-          moveCard('handPC', i, 'corner3', 0, changedHandPC);
+        changedHandPC = drawCard(changedHandPC);
+        console.log('king found-card added', i, changedHandPC);
+        if (changedCorner1.length === 0) {
+          moveCard(
+            'handPC',
+            i,
+            'corner1',
+            0,
+            changedHandPC,
+            changedCorner1,
+            changedCorner2,
+            changedCorner3,
+            changedCorner4
+          );
+        } else if (changedCorner2.length === 0) {
+          moveCard(
+            'handPC',
+            i,
+            'corner2',
+            0,
+            changedHandPC,
+            changedCorner1,
+            changedCorner2,
+            changedCorner3,
+            changedCorner4
+          );
+        } else if (changedCorner3.length === 0) {
+          moveCard(
+            'handPC',
+            i,
+            'corner3',
+            0,
+            changedHandPC,
+            changedCorner1,
+            changedCorner2,
+            changedCorner3,
+            changedCorner4
+          );
         } else {
-          moveCard('handPC', i, 'corner4', 0, changedHandPC);
+          moveCard(
+            'handPC',
+            i,
+            'corner4',
+            0,
+            changedHandPC,
+            changedCorner1,
+            changedCorner2,
+            changedCorner3,
+            changedCorner4
+          );
         }
-      } else {
-        console.log('no King found');
+        if (i > 0) {
+          i = i - 1;
+        }
       }
     }
-    //  b) Check to see if a card can be moved to Side1-4 or Corner1-4
-    //        If yes, move card and Check for end of game
+    // Check to see if a card from handPC can be moved to Side1-4 or Corner1-4 and move card
+    // Check for end of game
     endOfGameCheck();
     //  c) Check to see if entire Side1-4 piles can be moved to corner1-4 or to other Side1-4
     //        If yes, play a card(s) on any empty sides and Check for end of game
@@ -175,7 +227,11 @@ function App() {
     //
     setMessage('Draw card');
     setHandPC(changedHandPC);
-  }, [handPC, drawCard, moveCard]);
+    setCorner1(changedCorner1);
+    setCorner2(changedCorner2);
+    setCorner3(changedCorner3);
+    setCorner4(changedCorner4);
+  }, [handPC, drawCard, moveCard, corner1, corner2, corner3, corner4, endOfGameCheck]);
 
   // About the game
   const onAbout = useCallback(() => {
