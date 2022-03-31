@@ -152,7 +152,6 @@ function App() {
     // Draw Card
     changedHandPC = drawCard(changedHandPC);
     console.log('card drawn', changedHandPC);
-    console.log('**** card drawn', drawCard(changedHandPC));
     // Loop until no King's in handPC
     // If King is found in handPC, move to next available corner and Draw Card
     let i = 0;
@@ -161,7 +160,7 @@ function App() {
       console.log('for loop i', i, changedHandPC[i].code);
       kingPresent = changedHandPC[i].code.indexOf('K');
       if (kingPresent !== -1) {
-        changedHandPC = drawCard(changedHandPC);
+        // changedHandPC = drawCard(changedHandPC);
         console.log('king found-card added', i, changedHandPC);
         if (changedCorner1.length === 0) {
           moveCard(
