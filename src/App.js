@@ -115,8 +115,11 @@ function App() {
     changedHandPC => {
       let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
       console.log('drawCard changedHandPC top', changedHandPC);
-      fetch(urlDrawHand2)
-        .then(response => response.json())
+      let fetchPromise = fetch(urlDrawHand2);
+      console.log('fetchPromise',fetchPromise);
+      fetchPromise
+        .then(response => {response.json()
+          console.log('promise',response)})
         .then(data => {
           if (data.remaining === 0) {
             console.error('no cards left in deck');
