@@ -116,14 +116,14 @@ function App() {
       let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
       console.log('drawCard changedHandPC top', changedHandPC);
       let fetchPromise = fetch(urlDrawHand2);
-      console.log('fetchPromise',fetchPromise);
+      let cardDrawn = false;
       fetchPromise
-        .then(response => {response.json()
-          console.log('promise',response)})
+        .then(response => response.json())
         .then(data => {
           if (data.remaining === 0) {
             console.error('no cards left in deck');
           }
+          cardDrawn = true;
           let handEntry = {},
             sortKey = 0,
             sortCard = 0;
@@ -134,13 +134,14 @@ function App() {
             sortCard: sortCard,
             code: data.cards[0].code,
           };
-          console.log('drawCard changedHandPC card added-before', changedHandPC);
+          console.log('draw card new card',handEntry)
           changedHandPC.push(handEntry);
-          console.log('drawCard changedHandPC card added-after', changedHandPC);
+          console.log('draw card expanded hand',changedHandPC)
           setMessage('Draw card');
-          return changedHandPC;
-        });
-      return changedHandPC;
+          return cardDrawn;
+        })
+        //.catch(error => {setMessage('Try again')});
+      return cardDrawn;
     },
     [deckId]
   );
@@ -153,7 +154,9 @@ function App() {
     let changedCorner3 = corner3.slice();
     let changedCorner4 = corner4.slice();
     // Draw Card
-    changedHandPC = drawCard(changedHandPC);
+    let cardDrawn = drawCard(changedHandPC);
+    console.log('cardDrawn ***',cardDrawn);
+    //drawCard(changedHandPC);
     console.log('card drawn', changedHandPC);
     // Loop until no King's in handPC
     // If King is found in handPC, move to next available corner and Draw Card
