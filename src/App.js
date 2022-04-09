@@ -116,14 +116,12 @@ function App() {
       let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
       console.log('drawCard changedHandPC top', changedHandPC);
       let fetchPromise = fetch(urlDrawHand2);
-      let cardDrawn = false;
       fetchPromise
-        .then(response => response.json())
+        .then(response => {return response.json()})
         .then(data => {
           if (data.remaining === 0) {
             console.error('no cards left in deck');
           }
-          cardDrawn = true;
           let handEntry = {},
             sortKey = 0,
             sortCard = 0;
@@ -134,14 +132,12 @@ function App() {
             sortCard: sortCard,
             code: data.cards[0].code,
           };
-          console.log('draw card new card',handEntry)
           changedHandPC.push(handEntry);
-          console.log('draw card expanded hand',changedHandPC)
           setMessage('Draw card');
-          return cardDrawn;
+          return fetchPromise;
         })
         //.catch(error => {setMessage('Try again')});
-      return cardDrawn;
+      return fetchPromise;
     },
     [deckId]
   );
@@ -154,20 +150,16 @@ function App() {
     let changedCorner3 = corner3.slice();
     let changedCorner4 = corner4.slice();
     // Draw Card
-    let cardDrawn = drawCard(changedHandPC);
-    console.log('cardDrawn ***',cardDrawn);
+    let fetchPromise = drawCard(changedHandPC);
     //drawCard(changedHandPC);
-    console.log('card drawn', changedHandPC);
     // Loop until no King's in handPC
     // If King is found in handPC, move to next available corner and Draw Card
     let i = 0;
     let kingPresent = 0;
     for (i = 0; i < changedHandPC.length; i++) {
-      console.log('for loop i', i, changedHandPC[i].code);
       kingPresent = changedHandPC[i].code.indexOf('K');
       if (kingPresent !== -1) {
         // changedHandPC = drawCard(changedHandPC);
-        console.log('king found-card added', i, changedHandPC);
         if (changedCorner1.length === 0) {
           moveCard(
             'handPC',
@@ -231,6 +223,7 @@ function App() {
     //  d) Set message to indicate it is player's turn
     //
     setMessage('Draw card');
+    console.log('fetchPromise',fetchPromise);
     setHandPC(changedHandPC);
     setCorner1(changedCorner1);
     setCorner2(changedCorner2);
