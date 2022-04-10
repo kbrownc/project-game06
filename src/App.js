@@ -78,9 +78,7 @@ function App() {
       if (targetPile === 'corner1') {
         let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
         changedHandPC.splice(sourceIndex, 1);
-        console.log('moveCard changedHandPC card removed', changedHandPC);
         changedCorner1.splice(changedCorner1.length, 0, ...add);
-        console.log('moveCard changedCorner1 card added', changedCorner1);
       } else if (targetPile === 'corner2') {
         let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
         changedHandPC.splice(sourceIndex, 1);
@@ -114,7 +112,6 @@ function App() {
   const drawCard = useCallback(
     changedHandPC => {
       let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
-      console.log('drawCard changedHandPC top', changedHandPC);
       let fetchPromise = fetch(urlDrawHand2);
       fetchPromise
         .then(response => {return response.json()})
@@ -132,11 +129,12 @@ function App() {
             sortCard: sortCard,
             code: data.cards[0].code,
           };
+          console.log('drawCard card added', handEntry);
           changedHandPC.push(handEntry);
           setMessage('Draw card');
           return fetchPromise;
         })
-        //.catch(error => {setMessage('Try again')});
+        .catch(error => {setMessage('Try again')});
       return fetchPromise;
     },
     [deckId]
@@ -223,8 +221,7 @@ function App() {
     //  d) Set message to indicate it is player's turn
     //
     setMessage('Draw card');
-    console.log('fetchPromise',fetchPromise);
-    setHandPC(changedHandPC);
+    setTimeout(() => { setHandPC(changedHandPC); }, 500);
     setCorner1(changedCorner1);
     setCorner2(changedCorner2);
     setCorner3(changedCorner3);
