@@ -131,6 +131,7 @@ function App() {
           };
           console.log('drawCard card added', handEntry);
           changedHandPC.push(handEntry);
+          console.log('drawCard card added', changedHandPC);
           setMessage('Draw card');
           return fetchPromise;
         })
@@ -149,15 +150,14 @@ function App() {
     let changedCorner4 = corner4.slice();
     // Draw Card
     let fetchPromise = drawCard(changedHandPC);
-    //drawCard(changedHandPC);
     // Loop until no King's in handPC
     // If King is found in handPC, move to next available corner and Draw Card
     let i = 0;
     let kingPresent = 0;
+    console.log('onTurnDone', changedHandPC);
     for (i = 0; i < changedHandPC.length; i++) {
       kingPresent = changedHandPC[i].code.indexOf('K');
       if (kingPresent !== -1) {
-        // changedHandPC = drawCard(changedHandPC);
         if (changedCorner1.length === 0) {
           moveCard(
             'handPC',
