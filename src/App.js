@@ -61,6 +61,30 @@ function App() {
       });
   }, [deckId, hand]);
 
+  function MakeQuerablePromise(promise) {
+    if (promise.isFulfilled) return promise;
+
+    let isPending = true;
+    let isRejected = false;
+    let isFulfilled = false;
+    let result = promise.then(
+        function(v) {
+            isFulfilled = true;
+            isPending = false;
+            return v; 
+        }, 
+        function(e) {
+            isRejected = true;
+            isPending = false;
+            throw e; 
+        }
+    );
+    result.isFulfilled = function() { return isFulfilled; };
+    result.isPending = function() { return isPending; };
+    result.isRejected = function() { return isRejected; };
+    return result;
+  }
+
   // Move a card
   const moveCard = (
     sourcePile,
@@ -150,6 +174,8 @@ function App() {
     let changedCorner4 = corner4.slice();
     // Draw Card
     let fetchPromise = drawCard(changedHandPC);
+    let myPromise = MakeQuerablePromise(fetchPromise);
+
     // Loop until no King's in handPC
     // If King is found in handPC, move to next available corner and Draw Card
     let i = 0;
@@ -221,7 +247,15 @@ function App() {
     //  d) Set message to indicate it is player's turn
     //
     setMessage('Draw card');
-    setTimeout(() => { setHandPC(changedHandPC); }, 500);
+
+    myPromise.then(function(data){
+      if (myPromise.isFulfilled()) {
+        console.log('changedHandPC fulfilled',changedHandPC);
+        //setHandPC(changedHandPC);
+        setTimeout(() => { setHandPC(changedHandPC); }, 500);
+    }});
+
+    //setTimeout(() => { setHandPC(changedHandPC); }, 500);
     setCorner1(changedCorner1);
     setCorner2(changedCorner2);
     setCorner3(changedCorner3);

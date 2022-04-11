@@ -26,7 +26,7 @@ let originalPromise = new Promise(function(resolve,reject){
         resolve("Yeah !");
     },10000);
 });
-let myPromise = MakeQuerablePromise(originalPromise);
+let myPromise = MakeQuerablePromise(fetchPromise);
 
 console.log("Initial fulfilled:", myPromise.isFulfilled());//false
 console.log("Initial rejected:", myPromise.isRejected());//false
