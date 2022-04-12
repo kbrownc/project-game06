@@ -46,12 +46,10 @@ function App() {
         }
         let changedHand = hand.slice();
         let handEntry = {},
-          sortKey = 0,
           sortCard = 0;
         sortCard = calcSortCard(data.cards[0].value);
         handEntry = {
           cardImage: data.cards[0].image,
-          sortKey: changedHand.length,
           sortCard: sortCard,
           code: data.cards[0].code,
         };
@@ -144,12 +142,10 @@ function App() {
             console.error('no cards left in deck');
           }
           let handEntry = {},
-            sortKey = 0,
             sortCard = 0;
           sortCard = calcSortCard(data.cards[0].value);
           handEntry = {
             cardImage: data.cards[0].image,
-            sortKey: changedHandPC.length,
             sortCard: sortCard,
             code: data.cards[0].code,
           };
@@ -241,25 +237,24 @@ function App() {
     // Check to see if a card from handPC can be moved to Side1-4 or Corner1-4 and move card
     // Check for end of game
     endOfGameCheck();
-    //  c) Check to see if entire Side1-4 piles can be moved to corner1-4 or to other Side1-4
-    //        If yes, play a card(s) on any empty sides and Check for end of game
-    //     Redo c)
-    //  d) Set message to indicate it is player's turn
-    //
-    setMessage('Draw card');
 
+    // Check to see if entire Side1-4 piles can be moved to corner1-4 or to other Side1-4
+    // If yes, play a card(s) on any empty sides and Check for end of game, recheck for above line
+    //
+
+    // Wait for drawCard fetch to complete before updating handPC
     myPromise.then(function(data){
       if (myPromise.isFulfilled()) {
         console.log('changedHandPC fulfilled',changedHandPC);
-        //setHandPC(changedHandPC);
         setTimeout(() => { setHandPC(changedHandPC); }, 500);
     }});
 
-    //setTimeout(() => { setHandPC(changedHandPC); }, 500);
     setCorner1(changedCorner1);
     setCorner2(changedCorner2);
     setCorner3(changedCorner3);
     setCorner4(changedCorner4);
+    //  Set message to indicate it is player's turn
+    setMessage('Draw card');
   }, [handPC, drawCard, moveCard, corner1, corner2, corner3, corner4, endOfGameCheck]);
 
   // About the game
@@ -354,7 +349,6 @@ function App() {
           workSide3 = [],
           workSide4 = [];
         let handEntry = {},
-          sortKey = 0,
           sortCard = 0;
         let i = 0;
         // load player's hand
@@ -362,7 +356,6 @@ function App() {
           sortCard = calcSortCard(data.cards[i].value);
           handEntry = {
             cardImage: data.cards[i].image,
-            sortKey: i,
             sortCard: sortCard,
             code: data.cards[i].code,
           };
@@ -373,7 +366,6 @@ function App() {
           sortCard = calcSortCard(data.cards[i].value);
           handEntry = {
             cardImage: data.cards[i].image,
-            sortKey: i,
             sortCard: sortCard,
             code: data.cards[i].code,
           };
@@ -384,7 +376,6 @@ function App() {
           sortCard = calcSortCard(data.cards[i].value);
           handEntry = {
             cardImage: data.cards[i].image,
-            sortKey: i,
             sortCard: sortCard,
             code: data.cards[i].code,
           };
