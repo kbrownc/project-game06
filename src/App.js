@@ -30,11 +30,6 @@ function App() {
   const [expand7, setExpand7] = useState('Expand');
   const [expand8, setExpand8] = useState('Expand');
 
-  // Reset game
-  const onReset = useCallback(() => {
-    boardSetup();
-  }, []);
-
   // Draw card
   const onDraw = useCallback(() => {
     let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
@@ -61,7 +56,6 @@ function App() {
 
   function MakeQuerablePromise(promise) {
     if (promise.isFulfilled) return promise;
-
     let isPending = true;
     let isRejected = false;
     let isFulfilled = false;
@@ -83,38 +77,14 @@ function App() {
     return result;
   }
 
-  // Move a card
-  const moveCard = (
-    sourcePile,
-    sourceIndex,
-    targetPile,
-    targetIndex,
-    changedHandPC,
-    changedCorner1,
-    changedCorner2,
-    changedCorner3,
-    changedCorner4
-  ) => {
-    // console.log('moveCard', sourcePile, sourceIndex, targetPile, targetIndex, changedHandPC);
-    if (sourcePile === 'handPC') {
-      if (targetPile === 'corner1') {
-        let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
-        changedHandPC.splice(sourceIndex, 1);
-        changedCorner1.splice(changedCorner1.length, 0, ...add);
-      } else if (targetPile === 'corner2') {
-        let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
-        changedHandPC.splice(sourceIndex, 1);
-        changedCorner2.splice(changedCorner2.length, 0, ...add);
-      } else if (targetPile === 'corner3') {
-        let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
-        changedHandPC.splice(sourceIndex, 1);
-        changedCorner3.splice(changedCorner3.length, 0, ...add);
-      } else {
-        let add = changedHandPC.slice(sourceIndex, sourceIndex + 1);
-        changedHandPC.splice(sourceIndex, 1);
-        changedCorner4.splice(changedCorner4.length, 0, ...add);
-      }
-    }
+  // Move a card (includes a dynamic function)
+  const moveCard = (source, target, sourceIndex) => {
+    const move = function (source, target, sourceIndex) {
+        let add = source.slice(sourceIndex, sourceIndex + 1);
+        source.splice(sourceIndex, 1);
+        target.splice(target.length, 0, ...add);
+    };
+    move(source,target,sourceIndex);
   };
 
   // End of Game Check
@@ -149,9 +119,7 @@ function App() {
             sortCard: sortCard,
             code: data.cards[0].code,
           };
-          console.log('drawCard card added', handEntry);
           changedHandPC.push(handEntry);
-          console.log('drawCard card added', changedHandPC);
           setMessage('Draw card');
           return fetchPromise;
         })
@@ -176,57 +144,32 @@ function App() {
     // If King is found in handPC, move to next available corner and Draw Card
     let i = 0;
     let kingPresent = 0;
-    console.log('onTurnDone', changedHandPC);
     for (i = 0; i < changedHandPC.length; i++) {
       kingPresent = changedHandPC[i].code.indexOf('K');
       if (kingPresent !== -1) {
         if (changedCorner1.length === 0) {
           moveCard(
-            'handPC',
-            i,
-            'corner1',
-            0,
             changedHandPC,
             changedCorner1,
-            changedCorner2,
-            changedCorner3,
-            changedCorner4
+            i
           );
         } else if (changedCorner2.length === 0) {
           moveCard(
-            'handPC',
-            i,
-            'corner2',
-            0,
             changedHandPC,
-            changedCorner1,
             changedCorner2,
-            changedCorner3,
-            changedCorner4
+            i
           );
         } else if (changedCorner3.length === 0) {
           moveCard(
-            'handPC',
-            i,
-            'corner3',
-            0,
             changedHandPC,
-            changedCorner1,
-            changedCorner2,
             changedCorner3,
-            changedCorner4
+            i
           );
         } else {
           moveCard(
-            'handPC',
-            i,
-            'corner4',
-            0,
             changedHandPC,
-            changedCorner1,
-            changedCorner2,
-            changedCorner3,
-            changedCorner4
+            changedCorner4,
+            i
           );
         }
         if (i > 0) {
@@ -245,8 +188,8 @@ function App() {
     // Wait for drawCard fetch to complete before updating handPC
     myPromise.then(function(data){
       if (myPromise.isFulfilled()) {
-        console.log('changedHandPC fulfilled',changedHandPC);
-        setTimeout(() => { setHandPC(changedHandPC); }, 500);
+        setHandPC(changedHandPC)
+        // setTimeout(() => { setHandPC(changedHandPC) }, 500);
     }});
 
     setCorner1(changedCorner1);
@@ -348,6 +291,10 @@ function App() {
           workSide2 = [],
           workSide3 = [],
           workSide4 = [];
+        let workCorner1 = [],
+          workCorner2 = [],
+          workCorner3 = [],
+          workCorner4 = [];  
         let handEntry = {},
           sortCard = 0;
         let i = 0;
@@ -396,18 +343,26 @@ function App() {
         setSide2(workSide2);
         setSide3(workSide3);
         setSide4(workSide4);
+        setCorner1(workCorner1);
+        setCorner2(workCorner2);
+        setCorner3(workCorner3);
+        setCorner4(workCorner4);
         setDeckId(data.deck_id);
         setMessage('Draw card');
       });
   }, []);
 
-  // useEffect - Get 18 cards from deck
+  // useEffect - Get 18 cards from deck and place on playing board
   useEffect(() => {
     boardSetup();
   }, [boardSetup]);
 
-  // onDragEnd:
-  //      To support DragDropContext functionality
+  // Reset game
+  const onReset = useCallback(() => {
+    boardSetup();
+  }, [boardSetup]);
+
+  // onDragEnd: (DragDropContext functionality)
   const onDragEnd = result => {
     // store where the card was initially and where it was dropped
     const { destination, source } = result;
