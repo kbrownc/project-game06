@@ -174,19 +174,24 @@ function App() {
       }
     }
     // Check to see if a card from handPC can be moved to Side1-4 or Corner1-4 and move card
-    console.log('changedHandPC',changedHandPC);
+    console.log('changedHandPC', changedHandPC);
     i = 0;
     let cardsMoved = false;
     for (i = 0; i < changedHandPC.length; i++) {
-
-      console.log('handPC',changedHandPC[i].code,(['C','S'].indexOf(changedHandPC[i].code)));
-      if (changedSide1.length !== 0) 
-        {console.log('side1',changedSide1[changedSide1.length - 1].code,
-          (['C','S'].indexOf(changedSide1[changedSide1.length - 1].code)))}
-      else {console.log('side1')};
-      
-      if (changedSide1.length > 0 && (changedHandPC[i].sortCard + 1 === changedSide1[changedSide1.length - 1].sortCard) &&
-        changedHandPC[i].code !== changedSide1[changedSide1.length - 1].code) {
+      let handPCBlack = changedHandPC[i].code.includes('C') || changedHandPC[i].code.includes('S');
+      let side1Black;
+      if (changedSide1.length !== 0) {
+        side1Black =
+          changedSide1[changedSide1.length - 1].code.includes('C') ||
+          changedSide1[changedSide1.length - 1].code.includes('S');
+      } else {
+        side1Black = null;
+      }
+      if (
+        changedSide1.length > 0 &&
+        changedHandPC[i].sortCard + 1 === changedSide1[changedSide1.length - 1].sortCard &&
+        handPCBlack !== side1Black
+      ) {
         moveCard(changedHandPC, changedSide1, i);
         cardsMoved = true;
       }
@@ -213,6 +218,7 @@ function App() {
     setCorner2(changedCorner2);
     setCorner3(changedCorner3);
     setCorner4(changedCorner4);
+    setSide1(changedSide1);
     //  Set message to indicate it is player's turn
     setMessage('Draw card');
   }, [handPC, drawCard, moveCard, corner1, corner2, corner3, corner4, endOfGameCheck]);
