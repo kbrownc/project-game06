@@ -60,31 +60,37 @@ function App() {
     let isRejected = false;
     let isFulfilled = false;
     let result = promise.then(
-        function(v) {
-            isFulfilled = true;
-            isPending = false;
-            return v; 
-        }, 
-        function(e) {
-            isRejected = true;
-            isPending = false;
-            throw e; 
-        }
+      function (v) {
+        isFulfilled = true;
+        isPending = false;
+        return v;
+      },
+      function (e) {
+        isRejected = true;
+        isPending = false;
+        throw e;
+      }
     );
-    result.isFulfilled = function() { return isFulfilled; };
-    result.isPending = function() { return isPending; };
-    result.isRejected = function() { return isRejected; };
+    result.isFulfilled = function () {
+      return isFulfilled;
+    };
+    result.isPending = function () {
+      return isPending;
+    };
+    result.isRejected = function () {
+      return isRejected;
+    };
     return result;
   }
 
   // Move a card (includes a dynamic function)
   const moveCard = (source, target, sourceIndex) => {
     const move = function (source, target, sourceIndex) {
-        let add = source.slice(sourceIndex, sourceIndex + 1);
-        source.splice(sourceIndex, 1);
-        target.splice(target.length, 0, ...add);
+      let add = source.slice(sourceIndex, sourceIndex + 1);
+      source.splice(sourceIndex, 1);
+      target.splice(target.length, 0, ...add);
     };
-    move(source,target,sourceIndex);
+    move(source, target, sourceIndex);
   };
 
   // End of Game Check
@@ -106,7 +112,9 @@ function App() {
       let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
       let fetchPromise = fetch(urlDrawHand2);
       fetchPromise
-        .then(response => {return response.json()})
+        .then(response => {
+          return response.json();
+        })
         .then(data => {
           if (data.remaining === 0) {
             console.error('no cards left in deck');
@@ -123,7 +131,9 @@ function App() {
           setMessage('Draw card');
           return fetchPromise;
         })
-        .catch(error => {setMessage('Try again')});
+        .catch(error => {
+          setMessage('Try again');
+        });
       return fetchPromise;
     },
     [deckId]
@@ -136,48 +146,54 @@ function App() {
     let changedCorner2 = corner2.slice();
     let changedCorner3 = corner3.slice();
     let changedCorner4 = corner4.slice();
+    let changedSide1 = side1.slice();
     // Draw Card
     let fetchPromise = drawCard(changedHandPC);
     let myPromise = MakeQuerablePromise(fetchPromise);
 
     // Loop until no King's in handPC
-    // If King is found in handPC, move to next available corner and Draw Card
+    // If King is found in handPC, move to next available corner
     let i = 0;
     let kingPresent = 0;
     for (i = 0; i < changedHandPC.length; i++) {
       kingPresent = changedHandPC[i].code.indexOf('K');
       if (kingPresent !== -1) {
         if (changedCorner1.length === 0) {
-          moveCard(
-            changedHandPC,
-            changedCorner1,
-            i
-          );
+          moveCard(changedHandPC, changedCorner1, i);
         } else if (changedCorner2.length === 0) {
-          moveCard(
-            changedHandPC,
-            changedCorner2,
-            i
-          );
+          moveCard(changedHandPC, changedCorner2, i);
         } else if (changedCorner3.length === 0) {
-          moveCard(
-            changedHandPC,
-            changedCorner3,
-            i
-          );
+          moveCard(changedHandPC, changedCorner3, i);
         } else {
-          moveCard(
-            changedHandPC,
-            changedCorner4,
-            i
-          );
+          moveCard(changedHandPC, changedCorner4, i);
         }
+        // Decrement i if a card has been moved to pickup next card
         if (i > 0) {
           i = i - 1;
         }
       }
     }
     // Check to see if a card from handPC can be moved to Side1-4 or Corner1-4 and move card
+    console.log('changedHandPC',changedHandPC);
+    i = 0;
+    let cardsMoved = false;
+    for (i = 0; i < changedHandPC.length; i++) {
+
+      console.log('handPC',changedHandPC[i].code,(['C','S'].indexOf(changedHandPC[i].code)));
+      if (changedSide1.length !== 0) 
+        {console.log('side1',changedSide1[changedSide1.length - 1].code,
+          (['C','S'].indexOf(changedSide1[changedSide1.length - 1].code)))}
+      else {console.log('side1')};
+      
+      if (changedSide1.length > 0 && (changedHandPC[i].sortCard + 1 === changedSide1[changedSide1.length - 1].sortCard) &&
+        changedHandPC[i].code !== changedSide1[changedSide1.length - 1].code) {
+        moveCard(changedHandPC, changedSide1, i);
+        cardsMoved = true;
+      }
+      if (i === changedHandPC.length && cardsMoved) {
+        i = 0;
+      }
+    }
     // Check for end of game
     endOfGameCheck();
 
@@ -186,11 +202,12 @@ function App() {
     //
 
     // Wait for drawCard fetch to complete before updating handPC
-    myPromise.then(function(data){
+    myPromise.then(function (data) {
       if (myPromise.isFulfilled()) {
-        setHandPC(changedHandPC)
+        setHandPC(changedHandPC);
         // setTimeout(() => { setHandPC(changedHandPC) }, 500);
-    }});
+      }
+    });
 
     setCorner1(changedCorner1);
     setCorner2(changedCorner2);
@@ -294,7 +311,7 @@ function App() {
         let workCorner1 = [],
           workCorner2 = [],
           workCorner3 = [],
-          workCorner4 = [];  
+          workCorner4 = [];
         let handEntry = {},
           sortCard = 0;
         let i = 0;
