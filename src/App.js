@@ -147,6 +147,9 @@ function App() {
     let changedCorner3 = corner3.slice();
     let changedCorner4 = corner4.slice();
     let changedSide1 = side1.slice();
+    let changedSide2 = side2.slice();
+    let changedSide3 = side3.slice();
+    let changedSide4 = side4.slice();
     // Draw Card
     let fetchPromise = drawCard(changedHandPC);
     let myPromise = MakeQuerablePromise(fetchPromise);
@@ -174,7 +177,6 @@ function App() {
       }
     }
     // Check to see if a card from handPC can be moved to Side1-4 or Corner1-4 and move card
-    console.log('changedHandPC', changedHandPC);
     i = 0;
     let cardsMoved = false;
     for (i = 0; i < changedHandPC.length; i++) {
@@ -187,6 +189,14 @@ function App() {
       } else {
         side1Black = null;
       }
+      let side2Black;
+      if (changedSide2.length !== 0) {
+        side2Black =
+          changedSide2[changedSide2.length - 1].code.includes('C') ||
+          changedSide2[changedSide2.length - 1].code.includes('S');
+      } else {
+        side2Black = null;
+      }
       if (
         changedSide1.length > 0 &&
         changedHandPC[i].sortCard + 1 === changedSide1[changedSide1.length - 1].sortCard &&
@@ -194,9 +204,22 @@ function App() {
       ) {
         moveCard(changedHandPC, changedSide1, i);
         cardsMoved = true;
+        if (i > 0) {i = i - 1}
       }
-      if (i === changedHandPC.length && cardsMoved) {
-        i = 0;
+      if (
+        changedSide2.length > 0 &&
+        changedHandPC[i].sortCard + 1 === changedSide2[changedSide2.length - 1].sortCard &&
+        handPCBlack !== side2Black
+      ) {
+        moveCard(changedHandPC, changedSide2, i);
+        cardsMoved = true;
+        if (i > 0) {i = i - 1}
+      }
+
+      // if a card was moved, start loop over
+      if (i === changedHandPC.length - 1 && cardsMoved) {
+        i = -1;
+        cardsMoved = false;
       }
     }
     // Check for end of game
@@ -219,6 +242,9 @@ function App() {
     setCorner3(changedCorner3);
     setCorner4(changedCorner4);
     setSide1(changedSide1);
+    setSide2(changedSide2);
+    setSide3(changedSide3);
+    setSide4(changedSide4);
     //  Set message to indicate it is player's turn
     setMessage('Draw card');
   }, [handPC, drawCard, moveCard, corner1, corner2, corner3, corner4, endOfGameCheck]);
