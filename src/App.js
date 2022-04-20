@@ -214,6 +214,38 @@ function App() {
       } else {
         side4Black = null;
       }
+      let corner1Black;
+      if (changedCorner1.length !== 0) {
+        corner1Black =
+          changedCorner1[changedCorner1.length - 1].code.includes('C') ||
+          changedCorner1[changedCorner1.length - 1].code.includes('S');
+      } else {
+        corner1Black = null;
+      }
+      let corner2Black;
+      if (changedCorner2.length !== 0) {
+        corner2Black =
+          changedCorner2[changedCorner2.length - 1].code.includes('C') ||
+          changedCorner2[changedCorner2.length - 1].code.includes('S');
+      } else {
+        corner2Black = null;
+      }
+      let corner3Black;
+      if (changedCorner3.length !== 0) {
+        corner3Black =
+          changedCorner3[changedCorner3.length - 1].code.includes('C') ||
+          changedCorner3[changedCorner3.length - 1].code.includes('S');
+      } else {
+        corner3Black = null;
+      }
+      let corner4Black;
+      if (changedCorner4.length !== 0) {
+        corner4Black =
+          changedCorner4[changedCorner4.length - 1].code.includes('C') ||
+          changedCorner4[changedCorner4.length - 1].code.includes('S');
+      } else {
+        corner4Black = null;
+      }
       // check if I can move a card to side1
       if (
         changedSide1.length > 0 &&
@@ -254,6 +286,46 @@ function App() {
         cardsMoved = true;
         if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
       }
+      // check if I can move a card to corner1
+      if (
+        changedCorner1.length > 0 &&
+        changedHandPC[i].sortCard + 1 === changedCorner1[changedCorner1.length - 1].sortCard &&
+        handPCBlack !== corner1Black
+      ) {
+        moveCard(changedHandPC, changedCorner1, i);
+        cardsMoved = true;
+        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
+      }
+      // check if I can move a card to corner2
+      if (
+        changedCorner2.length > 0 &&
+        changedHandPC[i].sortCard + 1 === changedCorner2[changedCorner2.length - 1].sortCard &&
+        handPCBlack !== corner2Black
+      ) {
+        moveCard(changedHandPC, changedCorner2, i);
+        cardsMoved = true;
+        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
+      }
+      // check if I can move a card to corner3
+      if (
+        changedCorner3.length > 0 &&
+        changedHandPC[i].sortCard + 1 === changedCorner3[changedCorner3.length - 1].sortCard &&
+        handPCBlack !== corner3Black
+      ) {
+        moveCard(changedHandPC, changedCorner3, i);
+        cardsMoved = true;
+        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
+      }
+      // check if I can move a card to corner4
+      if (
+        changedCorner4.length > 0 &&
+        changedHandPC[i].sortCard + 1 === changedCorner4[changedCorner4.length - 1].sortCard &&
+        handPCBlack !== corner4Black
+      ) {
+        moveCard(changedHandPC, changedCorner4, i);
+        cardsMoved = true;
+        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
+      }
       // if a card was moved, start loop over
       if (i === changedHandPC.length - 1 && cardsMoved) {
         i = -1;
@@ -261,7 +333,7 @@ function App() {
       }
     }
     // Check for end of game
-    endOfGameCheck();
+    let workMessage = endOfGameCheck();
 
     // Check to see if entire Side1-4 piles can be moved to corner1-4 or to other Side1-4
     // If yes, play a card(s) on any empty sides and Check for end of game, recheck for above line
@@ -270,8 +342,8 @@ function App() {
     // Wait for drawCard fetch to complete before updating handPC
     myPromise.then(function (data) {
       if (myPromise.isFulfilled()) {
-        setHandPC(changedHandPC);
-        // setTimeout(() => { setHandPC(changedHandPC) }, 500);
+        //setHandPC(changedHandPC);
+        setTimeout(() => { setHandPC(changedHandPC) }, 500);
       }
     });
 
@@ -284,7 +356,7 @@ function App() {
     setSide3(changedSide3);
     setSide4(changedSide4);
     //  Set message to indicate it is player's turn
-    setMessage('Draw card');
+    setMessage(workMessage);
   }, [handPC, drawCard, moveCard, corner1, corner2, corner3, corner4, endOfGameCheck]);
 
   // About the game
