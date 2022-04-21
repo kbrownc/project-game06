@@ -96,6 +96,7 @@ function App() {
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
   const checkForMove = (source, target, sourceIndex, cardsMoved) => {
     let index = sourceIndex;
+    if (source.length === 0) return;
     let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
     let targetBlack = null;
     if (target.length !== 0) {
@@ -116,9 +117,9 @@ function App() {
   };
 
   // End of Game Check
-  const endOfGameCheck = () => {
+  const endOfGameCheck = (hand) => {
     let workMessage = '';
-    if (handPC.length === 0) {
+    if (hand.length === 0) {
       workMessage = 'end of game';
       console.error('end of game');
     } else {
@@ -154,7 +155,7 @@ function App() {
           return fetchPromise;
         })
         .catch(error => {
-          setMessage('Try again');
+          setMessage('Network error - Try again');
         });
       return fetchPromise;
     },
@@ -219,7 +220,7 @@ function App() {
       }
     }
     // Check for end of game
-    let workMessage = endOfGameCheck();
+    let workMessage = endOfGameCheck(changedHandPC);
 
     // Check to see if entire Side1-4 piles can be moved to corner1-4 or to other Side1-4
     // If yes, play a card(s) on any empty sides and Check for end of game, recheck for above line
@@ -248,7 +249,6 @@ function App() {
   // About the game
   const onAbout = useCallback(() => {
     alert('How to play the game');
-    setMessage('Draw card');
   }, []);
 
   // Expand card pile
@@ -303,7 +303,6 @@ function App() {
           setExpand8('Expand');
         }
       }
-      setMessage('Card pile Expanded');
     },
     [expand1, expand2, expand3, expand4, expand5, expand6, expand7, expand8]
   );
@@ -510,6 +509,9 @@ function App() {
     } else if (destination.droppableId === 'SIDE4') {
       changedSide4.splice(changedSide4.length, 0, ...add);
     }
+    // Check for end of game for player
+    let workMessage = endOfGameCheck(changedHand);
+
     // update state
     setHandPC(changedHandPC);
     setHand(changedHand);
@@ -521,6 +523,7 @@ function App() {
     setSide2(changedSide2);
     setSide3(changedSide3);
     setSide4(changedSide4);
+    setMessage(workMessage);
   };
 
   // The following 'if' statement is to stop an initial render error
