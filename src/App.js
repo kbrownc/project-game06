@@ -93,6 +93,28 @@ function App() {
     move(source, target, sourceIndex);
   };
 
+  // Figure out if a card can be moved (to a card 1 lower and opposite color)
+  const checkForMove = (source, target, sourceIndex, cardsMoved) => {
+    let index = sourceIndex;
+    let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
+    let targetBlack = null;
+    if (target.length !== 0) {
+      targetBlack =
+          target[target.length - 1].code.includes('C') ||
+          target[target.length - 1].code.includes('S');
+    }
+    if (
+        target.length > 0 &&
+        source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
+        sourceBlack !== targetBlack
+      ) {
+        moveCard(source, target, sourceIndex);
+        cardsMoved = true;
+        if (sourceIndex > 0) {index = sourceIndex - 1}
+    }
+    return index;
+  };
+
   // End of Game Check
   const endOfGameCheck = () => {
     let workMessage = '';
@@ -180,152 +202,16 @@ function App() {
     i = 0;
     let cardsMoved = false;
     for (i = 0; i < changedHandPC.length; i++) {
-      // find out color of handPC and side1-4 cards
-      let handPCBlack = changedHandPC[i].code.includes('C') || changedHandPC[i].code.includes('S');
-      let side1Black;
-      if (changedSide1.length !== 0) {
-        side1Black =
-          changedSide1[changedSide1.length - 1].code.includes('C') ||
-          changedSide1[changedSide1.length - 1].code.includes('S');
-      } else {
-        side1Black = null;
-      }
-      let side2Black;
-      if (changedSide2.length !== 0) {
-        side2Black =
-          changedSide2[changedSide2.length - 1].code.includes('C') ||
-          changedSide2[changedSide2.length - 1].code.includes('S');
-      } else {
-        side2Black = null;
-      }
-      let side3Black;
-      if (changedSide3.length !== 0) {
-        side3Black =
-          changedSide3[changedSide3.length - 1].code.includes('C') ||
-          changedSide3[changedSide3.length - 1].code.includes('S');
-      } else {
-        side3Black = null;
-      }
-      let side4Black;
-      if (changedSide4.length !== 0) {
-        side4Black =
-          changedSide4[changedSide4.length - 1].code.includes('C') ||
-          changedSide4[changedSide4.length - 1].code.includes('S');
-      } else {
-        side4Black = null;
-      }
-      let corner1Black;
-      if (changedCorner1.length !== 0) {
-        corner1Black =
-          changedCorner1[changedCorner1.length - 1].code.includes('C') ||
-          changedCorner1[changedCorner1.length - 1].code.includes('S');
-      } else {
-        corner1Black = null;
-      }
-      let corner2Black;
-      if (changedCorner2.length !== 0) {
-        corner2Black =
-          changedCorner2[changedCorner2.length - 1].code.includes('C') ||
-          changedCorner2[changedCorner2.length - 1].code.includes('S');
-      } else {
-        corner2Black = null;
-      }
-      let corner3Black;
-      if (changedCorner3.length !== 0) {
-        corner3Black =
-          changedCorner3[changedCorner3.length - 1].code.includes('C') ||
-          changedCorner3[changedCorner3.length - 1].code.includes('S');
-      } else {
-        corner3Black = null;
-      }
-      let corner4Black;
-      if (changedCorner4.length !== 0) {
-        corner4Black =
-          changedCorner4[changedCorner4.length - 1].code.includes('C') ||
-          changedCorner4[changedCorner4.length - 1].code.includes('S');
-      } else {
-        corner4Black = null;
-      }
-      // check if I can move a card to side1
-      if (
-        changedSide1.length > 0 &&
-        changedHandPC[i].sortCard + 1 === changedSide1[changedSide1.length - 1].sortCard &&
-        handPCBlack !== side1Black
-      ) {
-        moveCard(changedHandPC, changedSide1, i);
-        cardsMoved = true;
-        if (i > 0) {i = i - 1}
-      }
-      // check if I can move a card to side2
-      if (
-        changedSide2.length > 0 &&
-        changedHandPC[i].sortCard + 1 === changedSide2[changedSide2.length - 1].sortCard &&
-        handPCBlack !== side2Black
-      ) {
-        moveCard(changedHandPC, changedSide2, i);
-        cardsMoved = true;
-        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
-      }
-      // check if I can move a card to side3
-      if (
-        changedSide3.length > 0 &&
-        changedHandPC[i].sortCard + 1 === changedSide3[changedSide3.length - 1].sortCard &&
-        handPCBlack !== side3Black
-      ) {
-        moveCard(changedHandPC, changedSide3, i);
-        cardsMoved = true;
-        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
-      }
-      // check if I can move a card to side4
-      if (
-        changedSide4.length > 0 &&
-        changedHandPC[i].sortCard + 1 === changedSide4[changedSide4.length - 1].sortCard &&
-        handPCBlack !== side4Black
-      ) {
-        moveCard(changedHandPC, changedSide4, i);
-        cardsMoved = true;
-        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
-      }
-      // check if I can move a card to corner1
-      if (
-        changedCorner1.length > 0 &&
-        changedHandPC[i].sortCard + 1 === changedCorner1[changedCorner1.length - 1].sortCard &&
-        handPCBlack !== corner1Black
-      ) {
-        moveCard(changedHandPC, changedCorner1, i);
-        cardsMoved = true;
-        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
-      }
-      // check if I can move a card to corner2
-      if (
-        changedCorner2.length > 0 &&
-        changedHandPC[i].sortCard + 1 === changedCorner2[changedCorner2.length - 1].sortCard &&
-        handPCBlack !== corner2Black
-      ) {
-        moveCard(changedHandPC, changedCorner2, i);
-        cardsMoved = true;
-        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
-      }
-      // check if I can move a card to corner3
-      if (
-        changedCorner3.length > 0 &&
-        changedHandPC[i].sortCard + 1 === changedCorner3[changedCorner3.length - 1].sortCard &&
-        handPCBlack !== corner3Black
-      ) {
-        moveCard(changedHandPC, changedCorner3, i);
-        cardsMoved = true;
-        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
-      }
-      // check if I can move a card to corner4
-      if (
-        changedCorner4.length > 0 &&
-        changedHandPC[i].sortCard + 1 === changedCorner4[changedCorner4.length - 1].sortCard &&
-        handPCBlack !== corner4Black
-      ) {
-        moveCard(changedHandPC, changedCorner4, i);
-        cardsMoved = true;
-        if (i > 0) {i = i - 1}   // reset i if a card was moved to the new position of the next card
-      }
+      // find out if card is 1 less and color of cards are different
+      i = checkForMove(changedHandPC, changedSide1,   i, cardsMoved);
+      i = checkForMove(changedHandPC, changedSide2,   i, cardsMoved);
+      i = checkForMove(changedHandPC, changedSide3,   i, cardsMoved);
+      i = checkForMove(changedHandPC, changedSide4,   i, cardsMoved);
+      i = checkForMove(changedHandPC, changedCorner1, i, cardsMoved);
+      i = checkForMove(changedHandPC, changedCorner2, i, cardsMoved);
+      i = checkForMove(changedHandPC, changedCorner3, i, cardsMoved);
+      i = checkForMove(changedHandPC, changedCorner4, i, cardsMoved);
+
       // if a card was moved, start loop over
       if (i === changedHandPC.length - 1 && cardsMoved) {
         i = -1;
