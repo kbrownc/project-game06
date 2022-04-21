@@ -43,6 +43,9 @@ h4 {
   font-size: 12px;
   font-weight: bold;
 }
+.Invisible {
+  visibility: hidden;
+}
 .Box-expand {
   background-color: green;
   border: 1px solid black;

@@ -9,6 +9,7 @@ function App() {
 
   // State
   const [message, setMessage] = useState('Draw card');
+  const [endOfGame, setEndOfGame] = useState(false);
   const [side1, setSide1] = useState([]);
   const [side2, setSide2] = useState([]);
   const [side3, setSide3] = useState([]);
@@ -122,6 +123,7 @@ function App() {
     let workMessage = '';
     if (hand.length === 0) {
       workMessage = 'end of game';
+      setEndOfGame(true);
       console.error('end of game');
     } else {
       workMessage = 'draw a card';
@@ -396,6 +398,7 @@ function App() {
         setCorner4(workCorner4);
         setDeckId(data.deck_id);
         setMessage('Draw card');
+        setEndOfGame(false);
       });
   }, []);
 
@@ -541,10 +544,10 @@ function App() {
           <div className="Box Button" onClick={onReset}>
             Reset Game
           </div>
-          <div className="Box Button" onClick={onDraw}>
+          <div className={endOfGame ? "Invisible" : "Box Button"} onClick={onDraw}>
             Draw Card
           </div>
-          <div className="Box Button" onClick={onTurnDone}>
+          <div className={endOfGame ? "Invisible" : "Box Button"} onClick={onTurnDone}>
             Turn Complete
           </div>
           <div className="Box Button" onClick={onAbout}>
