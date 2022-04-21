@@ -101,23 +101,24 @@ function App() {
     let targetBlack = null;
     if (target.length !== 0) {
       targetBlack =
-          target[target.length - 1].code.includes('C') ||
-          target[target.length - 1].code.includes('S');
+        target[target.length - 1].code.includes('C') || target[target.length - 1].code.includes('S');
     }
     if (
-        target.length > 0 &&
-        source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
-        sourceBlack !== targetBlack
-      ) {
-        moveCard(source, target, sourceIndex);
-        cardsMoved = true;
-        if (sourceIndex > 0) {index = sourceIndex - 1}
+      target.length > 0 &&
+      source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
+      sourceBlack !== targetBlack
+    ) {
+      moveCard(source, target, sourceIndex);
+      cardsMoved = true;
+      if (sourceIndex > 0) {
+        index = sourceIndex - 1;
+      }
     }
     return index;
   };
 
   // End of Game Check
-  const endOfGameCheck = (hand) => {
+  const endOfGameCheck = hand => {
     let workMessage = '';
     if (hand.length === 0) {
       workMessage = 'end of game';
@@ -204,17 +205,17 @@ function App() {
     let cardsMoved = false;
     for (i = 0; i < changedHandPC.length; i++) {
       // find out if card is 1 less and color of cards are different
-      i = checkForMove(changedHandPC, changedSide1,   i, cardsMoved);
-      i = checkForMove(changedHandPC, changedSide2,   i, cardsMoved);
-      i = checkForMove(changedHandPC, changedSide3,   i, cardsMoved);
-      i = checkForMove(changedHandPC, changedSide4,   i, cardsMoved);
+      i = checkForMove(changedHandPC, changedSide1, i, cardsMoved);
+      i = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
+      i = checkForMove(changedHandPC, changedSide3, i, cardsMoved);
+      i = checkForMove(changedHandPC, changedSide4, i, cardsMoved);
       i = checkForMove(changedHandPC, changedCorner1, i, cardsMoved);
       i = checkForMove(changedHandPC, changedCorner2, i, cardsMoved);
       i = checkForMove(changedHandPC, changedCorner3, i, cardsMoved);
       i = checkForMove(changedHandPC, changedCorner4, i, cardsMoved);
 
-      // if a card was moved, start loop over
-      if (i === changedHandPC.length - 1 && cardsMoved) {
+      // if a card was moved, start main loop over
+      if (changedHandPC.length > 0 && cardsMoved) {
         i = -1;
         cardsMoved = false;
       }
@@ -222,15 +223,18 @@ function App() {
     // Check for end of game
     let workMessage = endOfGameCheck(changedHandPC);
 
-    // Check to see if entire Side1-4 piles can be moved to corner1-4 or to other Side1-4
-    // If yes, play a card(s) on any empty sides and Check for end of game, recheck for above line
+    // TODO:
+    // -Check to see if entire Side1-4 piles (which may be 1 card) can be moved to corner1-4 or to other Side1-4
+    // -If yes, play a card(s) on any empty sides created, check for end of game
+    // -check if another card can be played (main loop)
     //
 
     // Wait for drawCard fetch to complete before updating handPC
     myPromise.then(function (data) {
       if (myPromise.isFulfilled()) {
-        //setHandPC(changedHandPC);
-        setTimeout(() => { setHandPC(changedHandPC) }, 500);
+        setTimeout(() => {
+          setHandPC(changedHandPC);
+        }, 500);
       }
     });
 
@@ -242,7 +246,6 @@ function App() {
     setSide2(changedSide2);
     setSide3(changedSide3);
     setSide4(changedSide4);
-    //  Set message to indicate it is player's turn
     setMessage(workMessage);
   }, [handPC, drawCard, moveCard, corner1, corner2, corner3, corner4, endOfGameCheck]);
 
