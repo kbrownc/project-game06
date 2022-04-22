@@ -165,7 +165,9 @@ function App() {
     [deckId]
   );
 
+
   // Player's Turn complete - Computer's turn
+  //
   const onTurnDone = useCallback(() => {
     let changedHandPC = handPC.slice();
     let changedCorner1 = corner1.slice();
@@ -227,9 +229,25 @@ function App() {
 
     // TODO:
     // -Check to see if entire Side1-4 piles (which may be 1 card) can be moved to corner1-4 or to other Side1-4
-    // -If yes, play a card(s) on any empty sides created, check for end of game
-    // -check if another card can be played (main loop)
     //
+
+    // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side2(changedSide2[0])
+    //    move entire side2 to side1
+    //    move card from changedHandPC to changedSide2
+    //    check if card just played can be built on again from changedHandPC (repeat until cannot play)
+    //    checkEndOfGame
+    //    start over
+    // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side3(changedSide3[0])
+    //    move side3 to side1
+    //    move card from changedHandPC to changedSide3
+    //    checkEndOfGame
+    //    start over
+    // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side4(changedSide4[0])
+    //    move side4 to side1
+    //    move card from changedHandPC to changedSide4
+    //    checkEndOfGame
+    //    start over
+    // Repeat above for side2-4 (3 diff sides each time) and corner1-4 (4 sides each time)
 
     // Wait for drawCard fetch to complete before updating handPC
     myPromise.then(function (data) {
@@ -250,6 +268,7 @@ function App() {
     setSide4(changedSide4);
     setMessage(workMessage);
   }, [handPC, drawCard, moveCard, corner1, corner2, corner3, corner4, endOfGameCheck]);
+
 
   // About the game
   const onAbout = useCallback(() => {
