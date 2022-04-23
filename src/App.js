@@ -55,35 +55,6 @@ function App() {
       });
   }, [deckId, hand]);
 
-  function MakeQuerablePromise(promise) {
-    if (promise.isFulfilled) return promise;
-    let isPending = true;
-    let isRejected = false;
-    let isFulfilled = false;
-    let result = promise.then(
-      function (v) {
-        isFulfilled = true;
-        isPending = false;
-        return v;
-      },
-      function (e) {
-        isRejected = true;
-        isPending = false;
-        throw e;
-      }
-    );
-    result.isFulfilled = function () {
-      return isFulfilled;
-    };
-    result.isPending = function () {
-      return isPending;
-    };
-    result.isRejected = function () {
-      return isRejected;
-    };
-    return result;
-  }
-
   // Move a card (includes a dynamic function)
   const moveCard = (source, target, sourceIndex) => {
     const move = function (source, target, sourceIndex) {
@@ -134,11 +105,9 @@ function App() {
 
   // drawCard - Get 1 card from deck and place on handPC
   const drawCard = useCallback(
-    changedHandPC => {
+    () => {
       let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
-      let fetchPromise = fetch(urlDrawHand2);
-      fetchPromise
-        .then(response => {
+      return fetch(urlDrawHand2).then(response => {
           return response.json();
         })
         .then(data => {
@@ -153,14 +122,12 @@ function App() {
             sortCard: sortCard,
             code: data.cards[0].code,
           };
-          changedHandPC.push(handEntry);
           setMessage('Draw card');
-          return fetchPromise;
+          return handEntry;
         })
         .catch(error => {
           setMessage('Network error - Try again');
         });
-      return fetchPromise;
     },
     [deckId]
   );
@@ -179,95 +146,88 @@ function App() {
     let changedSide3 = side3.slice();
     let changedSide4 = side4.slice();
     // Draw Card
-    let fetchPromise = drawCard(changedHandPC);
-    let myPromise = MakeQuerablePromise(fetchPromise);
+    drawCard().then((handEntry) => {
+      changedHandPC.push(handEntry);
 
-    // Loop until no King's in handPC
-    // If King is found in handPC, move to next available corner
-    let i = 0;
-    let kingPresent = 0;
-    for (i = 0; i < changedHandPC.length; i++) {
-      kingPresent = changedHandPC[i].code.indexOf('K');
-      if (kingPresent !== -1) {
-        if (changedCorner1.length === 0) {
-          moveCard(changedHandPC, changedCorner1, i);
-        } else if (changedCorner2.length === 0) {
-          moveCard(changedHandPC, changedCorner2, i);
-        } else if (changedCorner3.length === 0) {
-          moveCard(changedHandPC, changedCorner3, i);
-        } else {
-          moveCard(changedHandPC, changedCorner4, i);
+      // Loop until no King's in handPC
+      // If King is found in handPC, move to next available corner
+      let i = 0;
+      let kingPresent = 0;
+      for (i = 0; i < changedHandPC.length; i++) {
+        kingPresent = changedHandPC[i].code.indexOf('K');
+        if (kingPresent !== -1) {
+          if (changedCorner1.length === 0) {
+            moveCard(changedHandPC, changedCorner1, i);
+          } else if (changedCorner2.length === 0) {
+            moveCard(changedHandPC, changedCorner2, i);
+          } else if (changedCorner3.length === 0) {
+            moveCard(changedHandPC, changedCorner3, i);
+          } else {
+            moveCard(changedHandPC, changedCorner4, i);
+          }
+          // Decrement i if a card has been moved to pickup next card
+          if (i > 0) {
+            i = i - 1;
+          }
         }
-        // Decrement i if a card has been moved to pickup next card
-        if (i > 0) {
-          i = i - 1;
+      }
+      // Check to see if a card from handPC can be moved to Side1-4 or Corner1-4 and move card
+      i = 0;
+      let cardsMoved = false;
+      for (i = 0; i < changedHandPC.length; i++) {
+        // find out if card is 1 less and color of cards are different
+        i = checkForMove(changedHandPC, changedSide1, i, cardsMoved);
+        i = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
+        i = checkForMove(changedHandPC, changedSide3, i, cardsMoved);
+        i = checkForMove(changedHandPC, changedSide4, i, cardsMoved);
+        i = checkForMove(changedHandPC, changedCorner1, i, cardsMoved);
+        i = checkForMove(changedHandPC, changedCorner2, i, cardsMoved);
+        i = checkForMove(changedHandPC, changedCorner3, i, cardsMoved);
+        i = checkForMove(changedHandPC, changedCorner4, i, cardsMoved);
+
+        // if a card was moved, start main loop over
+        if (changedHandPC.length > 0 && cardsMoved) {
+          i = -1;
+          cardsMoved = false;
         }
       }
-    }
-    // Check to see if a card from handPC can be moved to Side1-4 or Corner1-4 and move card
-    i = 0;
-    let cardsMoved = false;
-    for (i = 0; i < changedHandPC.length; i++) {
-      // find out if card is 1 less and color of cards are different
-      i = checkForMove(changedHandPC, changedSide1, i, cardsMoved);
-      i = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
-      i = checkForMove(changedHandPC, changedSide3, i, cardsMoved);
-      i = checkForMove(changedHandPC, changedSide4, i, cardsMoved);
-      i = checkForMove(changedHandPC, changedCorner1, i, cardsMoved);
-      i = checkForMove(changedHandPC, changedCorner2, i, cardsMoved);
-      i = checkForMove(changedHandPC, changedCorner3, i, cardsMoved);
-      i = checkForMove(changedHandPC, changedCorner4, i, cardsMoved);
+      // Check for end of game
+      let workMessage = endOfGameCheck(changedHandPC);
 
-      // if a card was moved, start main loop over
-      if (changedHandPC.length > 0 && cardsMoved) {
-        i = -1;
-        cardsMoved = false;
-      }
-    }
-    // Check for end of game
-    let workMessage = endOfGameCheck(changedHandPC);
+      // TODO:
+      // -Check to see if entire Side1-4 piles (which may be 1 card) can be moved to corner1-4 or to other Side1-4
+      //
 
-    // TODO:
-    // -Check to see if entire Side1-4 piles (which may be 1 card) can be moved to corner1-4 or to other Side1-4
-    //
+      // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side2(changedSide2[0])
+      //    move entire side2 to side1
+      //    move any card from changedHandPC to changedSide2
+      //    check if card just played can be built on again from changedHandPC (repeat until cannot play)
+      //    checkEndOfGame
+      //    start over
+      // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side3(changedSide3[0])
+      //    move side3 to side1
+      //    move any card from changedHandPC to changedSide3
+      //    checkEndOfGame
+      //    start over
+      // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side4(changedSide4[0])
+      //    move side4 to side1
+      //    move any card from changedHandPC to changedSide4
+      //    checkEndOfGame
+      //    start over
+      // Repeat above for side2-4 (3 diff sides each time) and corner1-4 (4 sides each time)
 
-    // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side2(changedSide2[0])
-    //    move entire side2 to side1
-    //    move card from changedHandPC to changedSide2
-    //    check if card just played can be built on again from changedHandPC (repeat until cannot play)
-    //    checkEndOfGame
-    //    start over
-    // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side3(changedSide3[0])
-    //    move side3 to side1
-    //    move card from changedHandPC to changedSide3
-    //    checkEndOfGame
-    //    start over
-    // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side4(changedSide4[0])
-    //    move side4 to side1
-    //    move card from changedHandPC to changedSide4
-    //    checkEndOfGame
-    //    start over
-    // Repeat above for side2-4 (3 diff sides each time) and corner1-4 (4 sides each time)
-
-    // Wait for drawCard fetch to complete before updating handPC
-    myPromise.then(function (data) {
-      if (myPromise.isFulfilled()) {
-        setTimeout(() => {
-          setHandPC(changedHandPC);
-        }, 500);
-      }
+      setHandPC(changedHandPC);
+      setCorner1(changedCorner1);
+      setCorner2(changedCorner2);
+      setCorner3(changedCorner3);
+      setCorner4(changedCorner4);
+      setSide1(changedSide1);
+      setSide2(changedSide2);
+      setSide3(changedSide3);
+      setSide4(changedSide4);
+      setMessage(workMessage);
     });
-
-    setCorner1(changedCorner1);
-    setCorner2(changedCorner2);
-    setCorner3(changedCorner3);
-    setCorner4(changedCorner4);
-    setSide1(changedSide1);
-    setSide2(changedSide2);
-    setSide3(changedSide3);
-    setSide4(changedSide4);
-    setMessage(workMessage);
-  }, [handPC, drawCard, moveCard, corner1, corner2, corner3, corner4, endOfGameCheck]);
+  }, [handPC, drawCard, moveCard, corner1, corner2, corner3, corner4, endOfGameCheck, checkForMove, side1, side2, side3, side4]);
 
 
   // About the game
