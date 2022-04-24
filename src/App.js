@@ -89,6 +89,26 @@ function App() {
     return [index, cardsMoved];
   };
 
+  // Figure out if a card can be moved (to a card 1 lower and opposite color)
+  //
+  // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side2(changedSide2[0])
+  //    move entire side2 to side1
+  //    move any card from changedHandPC to changedSide2
+  //    check if card just played can be built on again from changedHandPC (repeat until cannot play)
+  const checkForMovePile = (source, target, sourceIndex, cardsMoved) => {
+    let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
+    let targetBlack =
+        target[target.length - 1].code.includes('C') || target[target.length - 1].code.includes('S');
+    if (
+      source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
+      sourceBlack !== targetBlack
+    ) {
+      moveCard(source, target, sourceIndex);
+      cardsMoved = true;
+    }
+    return cardsMoved;
+  };
+
   // End of Game Check
   const endOfGameCheck = hand => {
     let workMessage = '';
@@ -192,30 +212,47 @@ function App() {
       let workMessage = endOfGameCheck(changedHandPC);
 
       // TODO:
-      // -Check to see if entire Side1-4 piles (which may be 1 card) can be moved to corner1-4 or to other Side1-4
+      // -Check to see if entire Side1-4 piles can be moved to corner1-4 or to another Side
       //
-      while (true) {
-        break;
-      }
-
       // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side2(changedSide2[0])
       //    move entire side2 to side1
       //    move any card from changedHandPC to changedSide2
       //    check if card just played can be built on again from changedHandPC (repeat until cannot play)
       //    checkEndOfGame
       //    start over - continue (stops processing of current loop and starts loop again)
-      // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side3(changedSide3[0])
-      //    move side3 to side1
-      //    move any card from changedHandPC to changedSide3
-      //    checkEndOfGame
-      //    start over - continue
-      // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side4(changedSide4[0])
-      //    move side4 to side1
-      //    move any card from changedHandPC to changedSide4
-      //    checkEndOfGame
-      //    start over - continue
       // Repeat above for side2-4 (3 diff sides each time) and corner1-4 (4 sides each time)
       // break (exits loop)
+      cardsMoved = false;
+      while (true) {
+        if (changedSide1.length > 0 && changedSide2.length > 0) {
+          cardsMoved = checkForMovePile(changedSide2, changedSide1, 0, cardsMoved);
+          if (cardsMoved) {
+            moveCard(changedHandPC, changedSide2, 0);
+            workMessage = endOfGameCheck(changedHandPC);
+            cardsMoved = false;
+            continue
+          };
+        }
+        if (changedSide1.length > 0 && changedSide3.length > 0) {
+          cardsMoved = checkForMovePile(changedSide3, changedSide1, 0, cardsMoved);
+          if (cardsMoved) {
+            moveCard(changedHandPC, changedSide3, 0);
+            workMessage = endOfGameCheck(changedHandPC);
+            cardsMoved = false;
+            continue
+          };
+        }
+        if (changedSide1.length > 0 && changedSide4.length > 0) {
+          cardsMoved = checkForMovePile(changedSide4, changedSide1, 0, cardsMoved);
+          if (cardsMoved) {
+            moveCard(changedHandPC, changedSide4, 0);
+            workMessage = endOfGameCheck(changedHandPC);
+            cardsMoved = false;
+            continue
+          };
+        }
+        break;
+      }
 
       setHandPC(changedHandPC);
       setCorner1(changedCorner1);
@@ -238,6 +275,7 @@ function App() {
     corner4,
     endOfGameCheck,
     checkForMove,
+    checkForMovePile,
     side1,
     side2,
     side3,
