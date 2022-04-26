@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import './App.css';
+import { fullDeck } from './fullDeck';
 
 function App() {
   // url variables
@@ -8,6 +9,7 @@ function App() {
   const urlGetDraw = 'https://deckofcardsapi.com/api/deck/new/draw/?count=18';
 
   // State
+  const [useTestBed, setUseTestBed] = useState(false);
   const [message, setMessage] = useState('Draw card');
   const [endOfGame, setEndOfGame] = useState(false);
   const [side1, setSide1] = useState([]);
@@ -90,11 +92,6 @@ function App() {
   };
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
-  //
-  // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side2(changedSide2[0])
-  //    move entire side2 to side1
-  //    move any card from changedHandPC to changedSide2
-  //    check if card just played can be built on again from changedHandPC (repeat until cannot play)
   const checkForMovePile = (source, target, sourceIndex, cardsMoved) => {
     let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
     let targetBlack =
@@ -103,7 +100,10 @@ function App() {
       source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
       sourceBlack !== targetBlack
     ) {
-      moveCard(source, target, sourceIndex);
+      let i = 0;
+      for (i = 0; i < source.length; i++) {
+        moveCard(source, target, i);  
+      }
       cardsMoved = true;
     }
     return cardsMoved;
@@ -201,13 +201,13 @@ function App() {
         [i, cardsMoved] = checkForMove(changedHandPC, changedCorner2, i, cardsMoved);
         [i, cardsMoved] = checkForMove(changedHandPC, changedCorner3, i, cardsMoved);
         [i, cardsMoved] = checkForMove(changedHandPC, changedCorner4, i, cardsMoved);
-
         // if a card was moved, start main loop over
         if (changedHandPC.length > 0 && cardsMoved) {
           i = -1;
           cardsMoved = false;
         }
       }
+
       // Check for end of game
       let workMessage = endOfGameCheck(changedHandPC);
 
@@ -217,7 +217,7 @@ function App() {
       // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side2(changedSide2[0])
       //    move entire side2 to side1
       //    move any card from changedHandPC to changedSide2
-      //    check if card just played can be built on again from changedHandPC (repeat until cannot play)
+      //    check if card just played can be built on again from changedHandPC (repeat until cannot play) ??????????
       //    checkEndOfGame
       //    start over - continue (stops processing of current loop and starts loop again)
       // Repeat above for side2-4 (3 diff sides each time) and corner1-4 (4 sides each time)
@@ -228,6 +228,20 @@ function App() {
           cardsMoved = checkForMovePile(changedSide2, changedSide1, 0, cardsMoved);
           if (cardsMoved) {
             moveCard(changedHandPC, changedSide2, 0);
+
+            // NEW: move to handle addition of card to empty pile  >>>>>>>>>>>>>>>>
+            i = 0;
+            let cardsMoved = false;
+            for (i = 0; i < changedHandPC.length; i++) {
+              [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
+              if (changedHandPC.length === 0) break;
+              if (cardsMoved) {
+                i = -1;
+                cardsMoved = false;
+              }
+            }
+            // NEW END
+
             workMessage = endOfGameCheck(changedHandPC);
             cardsMoved = false;
             continue
@@ -362,7 +376,74 @@ function App() {
 
   // boardSetup - Get 18 cards from deck and place on board
   const boardSetup = useCallback(() => {
-    fetch(urlGetDraw)
+    if (useTestBed) {
+      let workHand = [],
+          workHandPC = [];
+        let workSide1 = [],
+          workSide2 = [],
+          workSide3 = [],
+          workSide4 = [];
+        let workCorner1 = [],
+          workCorner2 = [],
+          workCorner3 = [],
+          workCorner4 = [];
+        let handEntry = {},
+          sortCard = 0;
+        let i = 0;
+        // load player's hand
+        for (i = 0; i < 7; i++) {
+          sortCard = calcSortCard(fullDeck[i].sortCard);
+          handEntry = {
+            cardImage: fullDeck[i].cardImage,
+            sortCard: sortCard,
+            code: fullDeck[i].code,
+          };
+          workHand.push(handEntry);
+        }
+        // load computer's hand
+        for (i = 7; i < 14; i++) {
+          sortCard = calcSortCard(fullDeck[i].sortCard);
+          handEntry = {
+            cardImage: fullDeck[i].cardImage,
+            sortCard: sortCard,
+            code: fullDeck[i].code,
+          };
+          workHandPC.push(handEntry);
+        }
+        //  load Side Pile's
+        for (i = 14; i < 18; i++) {
+          sortCard = calcSortCard(fullDeck[i].sortCard);
+          handEntry = {
+            cardImage: fullDeck[i].cardImage,
+            sortCard: sortCard,
+            code: fullDeck[i].code,
+          };
+          if (i === 14) {
+            workSide1.push(handEntry);
+          } else if (i === 15) {
+            workSide2.push(handEntry);
+          } else if (i === 16) {
+            workSide3.push(handEntry);
+          } else if (i === 17) {
+            workSide4.push(handEntry);
+          }
+        }
+        // update state
+        setHand(workHand);
+        setHandPC(workHandPC);
+        setSide1(workSide1);
+        setSide2(workSide2);
+        setSide3(workSide3);
+        setSide4(workSide4);
+        setCorner1(workCorner1);
+        setCorner2(workCorner2);
+        setCorner3(workCorner3);
+        setCorner4(workCorner4);
+        setDeckId('1234567890');
+        setMessage('Draw card');
+        setEndOfGame(false);
+    } else {
+      fetch(urlGetDraw)
       .then(response => response.json())
       .then(data => {
         let workHand = [],
@@ -431,6 +512,7 @@ function App() {
         setMessage('Draw card');
         setEndOfGame(false);
       });
+    }; 
   }, []);
 
   // useEffect - Get 18 cards from deck and place on playing board
