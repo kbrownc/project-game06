@@ -6,10 +6,13 @@ import { fullDeck } from './fullDeck';
 function App() {
   // url variables
   const urlDrawHand = 'https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=1';
+  const urlDrawHandTest = 'https://dog.ceo/api/breeds/image/random';
   const urlGetDraw = 'https://deckofcardsapi.com/api/deck/new/draw/?count=18';
 
   // State
-  const [useTestBed, setUseTestBed] = useState(false);
+  const [useTestBed, setUseTestBed] = useState(true);
+
+  const [cardsUsed, setCardsUsed] = useState(0);
   const [message, setMessage] = useState('Draw card');
   const [endOfGame, setEndOfGame] = useState(false);
   const [side1, setSide1] = useState([]);
@@ -36,7 +39,27 @@ function App() {
   // Draw card
   const onDraw = useCallback(() => {
     let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
-    fetch(urlDrawHand2)
+    if (useTestBed) {
+      if (cardsUsed === 52) {
+          console.error('no cards left in deck');
+        }
+        let workCardsUsed = cardsUsed + 1;
+        let changedHand = hand.slice();
+        let handEntry = {},
+          sortCard = 0;
+        sortCard = calcSortCard(fullDeck[workCardsUsed].sortCard);
+        handEntry = {
+          cardImage: fullDeck[workCardsUsed].cardImage,
+          sortCard: sortCard,
+          code: fullDeck[workCardsUsed].code,
+        };
+        console.log('cardsUsed onDraw',workCardsUsed,fullDeck[workCardsUsed].code);
+        changedHand.push(handEntry);
+        setHand(changedHand);
+        setMessage('Card drawn');
+        setCardsUsed(workCardsUsed);
+    } else {
+      fetch(urlDrawHand2)
       .then(response => response.json())
       .then(data => {
         if (data.remaining === 0) {
@@ -55,6 +78,7 @@ function App() {
         setHand(changedHand);
         setMessage('Card drawn');
       });
+    };
   }, [deckId, hand]);
 
   // Move a card (includes a dynamic function)
@@ -126,21 +150,35 @@ function App() {
   // drawCard - Get 1 card from deck and place on handPC
   const drawCard = useCallback(() => {
     let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
+    if (useTestBed) {urlDrawHand2 = urlDrawHandTest;}
     return fetch(urlDrawHand2)
       .then(response => {
         return response.json();
       })
       .then(data => {
-        if (data.remaining === 0) {
-          console.error('no cards left in deck');
-        }
         let handEntry = {},
           sortCard = 0;
-        sortCard = calcSortCard(data.cards[0].value);
-        handEntry = {
-          cardImage: data.cards[0].image,
-          sortCard: sortCard,
-          code: data.cards[0].code,
+        let workCardsUsed = cardsUsed + 1;
+        if (useTestBed) {
+          if (cardsUsed === 52) console.error('no cards left in deck');
+          sortCard = calcSortCard(fullDeck[workCardsUsed].sortCard);
+          handEntry = {
+            cardImage: fullDeck[workCardsUsed].cardImage,
+            sortCard: sortCard,
+            code: fullDeck[workCardsUsed].code,
+          };
+          console.log('cardsUsed drawCard',workCardsUsed,fullDeck[workCardsUsed].code);
+          setCardsUsed(workCardsUsed);
+        } else {
+          if (data.remaining === 0) {
+            console.error('no cards left in deck');
+          }
+          sortCard = calcSortCard(data.cards[0].value);
+          handEntry = {
+            cardImage: data.cards[0].image,
+            sortCard: sortCard,
+            code: data.cards[0].code,
+          };
         };
         setMessage('Draw card');
         return handEntry;
@@ -163,8 +201,8 @@ function App() {
     let changedSide3 = side3.slice();
     let changedSide4 = side4.slice();
     // Draw Card
-    drawCard().then(handEntry => {
-      changedHandPC.push(handEntry);
+      drawCard().then(handEntry => {
+        changedHandPC.push(handEntry);
 
       // Loop until no King's in handPC
       // If King is found in handPC, move to next available corner
@@ -377,6 +415,7 @@ function App() {
   // boardSetup - Get 18 cards from deck and place on board
   const boardSetup = useCallback(() => {
     if (useTestBed) {
+      console.log('*** Test Bed in use ***');
       let workHand = [],
           workHandPC = [];
         let workSide1 = [],
@@ -398,6 +437,7 @@ function App() {
             sortCard: sortCard,
             code: fullDeck[i].code,
           };
+          console.log('cardsUsed',i,fullDeck[i].code);
           workHand.push(handEntry);
         }
         // load computer's hand
@@ -408,6 +448,7 @@ function App() {
             sortCard: sortCard,
             code: fullDeck[i].code,
           };
+          console.log('cardsUsed',i,fullDeck[i].code);
           workHandPC.push(handEntry);
         }
         //  load Side Pile's
@@ -418,6 +459,7 @@ function App() {
             sortCard: sortCard,
             code: fullDeck[i].code,
           };
+          console.log('cardsUsed',i,fullDeck[i].code);
           if (i === 14) {
             workSide1.push(handEntry);
           } else if (i === 15) {
@@ -429,6 +471,8 @@ function App() {
           }
         }
         // update state
+        console.log('cardsUsed state',17);
+        setCardsUsed(17);
         setHand(workHand);
         setHandPC(workHandPC);
         setSide1(workSide1);
