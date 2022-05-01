@@ -41,44 +41,44 @@ function App() {
     let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
     if (useTestBed) {
       if (cardsUsed === 52) {
-          console.error('no cards left in deck');
-        }
-        let workCardsUsed = cardsUsed + 1;
-        let changedHand = hand.slice();
-        let handEntry = {},
-          sortCard = 0;
-        sortCard = calcSortCard(fullDeck[workCardsUsed].sortCard);
-        handEntry = {
-          cardImage: fullDeck[workCardsUsed].cardImage,
-          sortCard: sortCard,
-          code: fullDeck[workCardsUsed].code,
-        };
-        console.log('cardsUsed onDraw',workCardsUsed,fullDeck[workCardsUsed].code);
-        changedHand.push(handEntry);
-        setHand(changedHand);
-        setMessage('Card drawn');
-        setCardsUsed(workCardsUsed);
+        console.error('no cards left in deck');
+      }
+      let workCardsUsed = cardsUsed + 1;
+      let changedHand = hand.slice();
+      let handEntry = {},
+        sortCard = 0;
+      sortCard = calcSortCard(fullDeck[workCardsUsed].sortCard);
+      handEntry = {
+        cardImage: fullDeck[workCardsUsed].cardImage,
+        sortCard: sortCard,
+        code: fullDeck[workCardsUsed].code,
+      };
+      console.log('cardsUsed onDraw', workCardsUsed, fullDeck[workCardsUsed].code);
+      changedHand.push(handEntry);
+      setHand(changedHand);
+      setMessage('Card drawn');
+      setCardsUsed(workCardsUsed);
     } else {
       fetch(urlDrawHand2)
-      .then(response => response.json())
-      .then(data => {
-        if (data.remaining === 0) {
-          console.error('no cards left in deck');
-        }
-        let changedHand = hand.slice();
-        let handEntry = {},
-          sortCard = 0;
-        sortCard = calcSortCard(data.cards[0].value);
-        handEntry = {
-          cardImage: data.cards[0].image,
-          sortCard: sortCard,
-          code: data.cards[0].code,
-        };
-        changedHand.push(handEntry);
-        setHand(changedHand);
-        setMessage('Card drawn');
-      });
-    };
+        .then(response => response.json())
+        .then(data => {
+          if (data.remaining === 0) {
+            console.error('no cards left in deck');
+          }
+          let changedHand = hand.slice();
+          let handEntry = {},
+            sortCard = 0;
+          sortCard = calcSortCard(data.cards[0].value);
+          handEntry = {
+            cardImage: data.cards[0].image,
+            sortCard: sortCard,
+            code: data.cards[0].code,
+          };
+          changedHand.push(handEntry);
+          setHand(changedHand);
+          setMessage('Card drawn');
+        });
+    }
   }, [deckId, hand]);
 
   // Move a card (includes a dynamic function)
@@ -92,7 +92,7 @@ function App() {
   };
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
-  const checkForMove = (source, target, sourceIndex, cardsMoved) => {
+  const checkForMove = (source, target, sourceIndex, cardsMoved, name) => {
     let index = sourceIndex;
     if (source.length === 0) return;
     let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
@@ -106,6 +106,7 @@ function App() {
       source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
       sourceBlack !== targetBlack
     ) {
+      console.log('onTurnDone card moved', source[sourceIndex].code, 'to', name, target);
       moveCard(source, target, sourceIndex);
       cardsMoved = true;
       if (sourceIndex > 0) {
@@ -119,16 +120,17 @@ function App() {
   const checkForMovePile = (source, target, sourceIndex, cardsMoved) => {
     let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
     let targetBlack =
-        target[target.length - 1].code.includes('C') || target[target.length - 1].code.includes('S');
-    if (
-      source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
-      sourceBlack !== targetBlack
-    ) {
+      target[target.length - 1].code.includes('C') || target[target.length - 1].code.includes('S');
+    if (source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
+      sourceBlack !== targetBlack) {
       let i = 0;
       for (i = 0; i < source.length; i++) {
-        moveCard(source, target, i);  
+        console.log('onTurnDone cardPile moved', source[i].code, target);
+        moveCard(source, target, i);
       }
       cardsMoved = true;
+    } else {
+      cardsMoved = false;
     }
     return cardsMoved;
   };
@@ -150,7 +152,9 @@ function App() {
   // drawCard - Get 1 card from deck and place on handPC
   const drawCard = useCallback(() => {
     let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
-    if (useTestBed) {urlDrawHand2 = urlDrawHandTest;}
+    if (useTestBed) {
+      urlDrawHand2 = urlDrawHandTest;
+    }
     return fetch(urlDrawHand2)
       .then(response => {
         return response.json();
@@ -167,7 +171,6 @@ function App() {
             sortCard: sortCard,
             code: fullDeck[workCardsUsed].code,
           };
-          console.log('cardsUsed drawCard',workCardsUsed,fullDeck[workCardsUsed].code);
           setCardsUsed(workCardsUsed);
         } else {
           if (data.remaining === 0) {
@@ -179,7 +182,7 @@ function App() {
             sortCard: sortCard,
             code: data.cards[0].code,
           };
-        };
+        }
         setMessage('Draw card');
         return handEntry;
       })
@@ -201,8 +204,9 @@ function App() {
     let changedSide3 = side3.slice();
     let changedSide4 = side4.slice();
     // Draw Card
-      drawCard().then(handEntry => {
-        changedHandPC.push(handEntry);
+    drawCard().then(handEntry => {
+      changedHandPC.push(handEntry);
+      console.log('onTurnDone card added', handEntry.code,changedHandPC);
 
       // Loop until no King's in handPC
       // If King is found in handPC, move to next available corner
@@ -212,12 +216,16 @@ function App() {
         kingPresent = changedHandPC[i].code.indexOf('K');
         if (kingPresent !== -1) {
           if (changedCorner1.length === 0) {
+            console.log('onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner1, i);
           } else if (changedCorner2.length === 0) {
+            console.log('onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner2, i);
           } else if (changedCorner3.length === 0) {
+            console.log('onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner3, i);
           } else {
+            console.log('onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner4, i);
           }
           // Decrement i if a card has been moved to pickup next card
@@ -231,14 +239,14 @@ function App() {
       let cardsMoved = false;
       for (i = 0; i < changedHandPC.length; i++) {
         // find out if card is 1 less and color of cards are different
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide1, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide3, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide4, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner1, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner2, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner3, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner4, i, cardsMoved);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide1, i, cardsMoved, 'changedSide1');
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved, 'changedSide2');
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide3, i, cardsMoved, 'changedSide3');
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide4, i, cardsMoved, 'changedSide4');
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner1, i, cardsMoved, 'changedCorner1');
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner2, i, cardsMoved, 'changedCorner2');
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner3, i, cardsMoved, 'changedCorner3');
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner4, i, cardsMoved, 'changedCorner4');
         // if a card was moved, start main loop over
         if (changedHandPC.length > 0 && cardsMoved) {
           i = -1;
@@ -265,46 +273,49 @@ function App() {
         if (changedSide1.length > 0 && changedSide2.length > 0) {
           cardsMoved = checkForMovePile(changedSide2, changedSide1, 0, cardsMoved);
           if (cardsMoved) {
+            console.log('onTurnDone card moved fill empty slot', changedHandPC[0].code, 'to changeSide2');
             moveCard(changedHandPC, changedSide2, 0);
 
             // NEW: move to handle addition of card to empty pile  >>>>>>>>>>>>>>>>
-            i = 0;
-            let cardsMoved = false;
-            for (i = 0; i < changedHandPC.length; i++) {
-              [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
-              if (changedHandPC.length === 0) break;
-              if (cardsMoved) {
-                i = -1;
-                cardsMoved = false;
-              }
-            }
+            // i = 0;
+            // let cardsMoved = false;
+            // for (i = 0; i < changedHandPC.length; i++) {
+            //   [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
+            //   if (changedHandPC.length === 0) break;
+            //   if (cardsMoved) {
+            //     i = -1;
+            //     cardsMoved = false;
+            //   }
+            // }
             // NEW END
 
             workMessage = endOfGameCheck(changedHandPC);
             cardsMoved = false;
-            continue
-          };
+            continue;
+          }
         }
         if (changedSide1.length > 0 && changedSide3.length > 0) {
           cardsMoved = checkForMovePile(changedSide3, changedSide1, 0, cardsMoved);
           if (cardsMoved) {
+            console.log('onTurnDone card moved fill empty slot', changedHandPC[0].code, 'to changeSide3',changedSide3);
             moveCard(changedHandPC, changedSide3, 0);
             workMessage = endOfGameCheck(changedHandPC);
             cardsMoved = false;
-            continue
-          };
+            continue;
+          }
         }
         if (changedSide1.length > 0 && changedSide4.length > 0) {
           cardsMoved = checkForMovePile(changedSide4, changedSide1, 0, cardsMoved);
           if (cardsMoved) {
+            console.log('onTurnDone card moved fill empty slot', changedHandPC[0].code, 'to changeSide4');
             moveCard(changedHandPC, changedSide4, 0);
             workMessage = endOfGameCheck(changedHandPC);
             cardsMoved = false;
-            continue
-          };
+            continue;
+          }
         }
         break;
-      }
+      };
 
       setHandPC(changedHandPC);
       setCorner1(changedCorner1);
@@ -316,6 +327,7 @@ function App() {
       setSide3(changedSide3);
       setSide4(changedSide4);
       setMessage(workMessage);
+      console.log("*** End of PC processing");
     });
   }, [
     handPC,
@@ -417,146 +429,142 @@ function App() {
     if (useTestBed) {
       console.log('*** Test Bed in use ***');
       let workHand = [],
-          workHandPC = [];
-        let workSide1 = [],
-          workSide2 = [],
-          workSide3 = [],
-          workSide4 = [];
-        let workCorner1 = [],
-          workCorner2 = [],
-          workCorner3 = [],
-          workCorner4 = [];
-        let handEntry = {},
-          sortCard = 0;
-        let i = 0;
-        // load player's hand
-        for (i = 0; i < 7; i++) {
-          sortCard = calcSortCard(fullDeck[i].sortCard);
-          handEntry = {
-            cardImage: fullDeck[i].cardImage,
-            sortCard: sortCard,
-            code: fullDeck[i].code,
-          };
-          console.log('cardsUsed',i,fullDeck[i].code);
-          workHand.push(handEntry);
+        workHandPC = [];
+      let workSide1 = [],
+        workSide2 = [],
+        workSide3 = [],
+        workSide4 = [];
+      let workCorner1 = [],
+        workCorner2 = [],
+        workCorner3 = [],
+        workCorner4 = [];
+      let handEntry = {},
+        sortCard = 0;
+      let i = 0;
+      // load player's hand
+      for (i = 0; i < 7; i++) {
+        sortCard = calcSortCard(fullDeck[i].sortCard);
+        handEntry = {
+          cardImage: fullDeck[i].cardImage,
+          sortCard: sortCard,
+          code: fullDeck[i].code,
+        };
+        workHand.push(handEntry);
+      }
+      // load computer's hand
+      for (i = 7; i < 14; i++) {
+        sortCard = calcSortCard(fullDeck[i].sortCard);
+        handEntry = {
+          cardImage: fullDeck[i].cardImage,
+          sortCard: sortCard,
+          code: fullDeck[i].code,
+        };
+        workHandPC.push(handEntry);
+      }
+      //  load Side Pile's
+      for (i = 14; i < 18; i++) {
+        sortCard = calcSortCard(fullDeck[i].sortCard);
+        handEntry = {
+          cardImage: fullDeck[i].cardImage,
+          sortCard: sortCard,
+          code: fullDeck[i].code,
+        };
+        if (i === 14) {
+          workSide1.push(handEntry);
+        } else if (i === 15) {
+          workSide2.push(handEntry);
+        } else if (i === 16) {
+          workSide3.push(handEntry);
+        } else if (i === 17) {
+          workSide4.push(handEntry);
         }
-        // load computer's hand
-        for (i = 7; i < 14; i++) {
-          sortCard = calcSortCard(fullDeck[i].sortCard);
-          handEntry = {
-            cardImage: fullDeck[i].cardImage,
-            sortCard: sortCard,
-            code: fullDeck[i].code,
-          };
-          console.log('cardsUsed',i,fullDeck[i].code);
-          workHandPC.push(handEntry);
-        }
-        //  load Side Pile's
-        for (i = 14; i < 18; i++) {
-          sortCard = calcSortCard(fullDeck[i].sortCard);
-          handEntry = {
-            cardImage: fullDeck[i].cardImage,
-            sortCard: sortCard,
-            code: fullDeck[i].code,
-          };
-          console.log('cardsUsed',i,fullDeck[i].code);
-          if (i === 14) {
-            workSide1.push(handEntry);
-          } else if (i === 15) {
-            workSide2.push(handEntry);
-          } else if (i === 16) {
-            workSide3.push(handEntry);
-          } else if (i === 17) {
-            workSide4.push(handEntry);
-          }
-        }
-        // update state
-        console.log('cardsUsed state',17);
-        setCardsUsed(17);
-        setHand(workHand);
-        setHandPC(workHandPC);
-        setSide1(workSide1);
-        setSide2(workSide2);
-        setSide3(workSide3);
-        setSide4(workSide4);
-        setCorner1(workCorner1);
-        setCorner2(workCorner2);
-        setCorner3(workCorner3);
-        setCorner4(workCorner4);
-        setDeckId('1234567890');
-        setMessage('Draw card');
-        setEndOfGame(false);
+      }
+      // update state
+      setCardsUsed(17);
+      setHand(workHand);
+      setHandPC(workHandPC);
+      setSide1(workSide1);
+      setSide2(workSide2);
+      setSide3(workSide3);
+      setSide4(workSide4);
+      setCorner1(workCorner1);
+      setCorner2(workCorner2);
+      setCorner3(workCorner3);
+      setCorner4(workCorner4);
+      setDeckId('1234567890');
+      setMessage('Draw card');
+      setEndOfGame(false);
     } else {
       fetch(urlGetDraw)
-      .then(response => response.json())
-      .then(data => {
-        let workHand = [],
-          workHandPC = [];
-        let workSide1 = [],
-          workSide2 = [],
-          workSide3 = [],
-          workSide4 = [];
-        let workCorner1 = [],
-          workCorner2 = [],
-          workCorner3 = [],
-          workCorner4 = [];
-        let handEntry = {},
-          sortCard = 0;
-        let i = 0;
-        // load player's hand
-        for (i = 0; i < 7; i++) {
-          sortCard = calcSortCard(data.cards[i].value);
-          handEntry = {
-            cardImage: data.cards[i].image,
-            sortCard: sortCard,
-            code: data.cards[i].code,
-          };
-          workHand.push(handEntry);
-        }
-        // load computer's hand
-        for (i = 7; i < 14; i++) {
-          sortCard = calcSortCard(data.cards[i].value);
-          handEntry = {
-            cardImage: data.cards[i].image,
-            sortCard: sortCard,
-            code: data.cards[i].code,
-          };
-          workHandPC.push(handEntry);
-        }
-        //  load Side Pile's
-        for (i = 14; i < 18; i++) {
-          sortCard = calcSortCard(data.cards[i].value);
-          handEntry = {
-            cardImage: data.cards[i].image,
-            sortCard: sortCard,
-            code: data.cards[i].code,
-          };
-          if (i === 14) {
-            workSide1.push(handEntry);
-          } else if (i === 15) {
-            workSide2.push(handEntry);
-          } else if (i === 16) {
-            workSide3.push(handEntry);
-          } else if (i === 17) {
-            workSide4.push(handEntry);
+        .then(response => response.json())
+        .then(data => {
+          let workHand = [],
+            workHandPC = [];
+          let workSide1 = [],
+            workSide2 = [],
+            workSide3 = [],
+            workSide4 = [];
+          let workCorner1 = [],
+            workCorner2 = [],
+            workCorner3 = [],
+            workCorner4 = [];
+          let handEntry = {},
+            sortCard = 0;
+          let i = 0;
+          // load player's hand
+          for (i = 0; i < 7; i++) {
+            sortCard = calcSortCard(data.cards[i].value);
+            handEntry = {
+              cardImage: data.cards[i].image,
+              sortCard: sortCard,
+              code: data.cards[i].code,
+            };
+            workHand.push(handEntry);
           }
-        }
-        // update state
-        setHand(workHand);
-        setHandPC(workHandPC);
-        setSide1(workSide1);
-        setSide2(workSide2);
-        setSide3(workSide3);
-        setSide4(workSide4);
-        setCorner1(workCorner1);
-        setCorner2(workCorner2);
-        setCorner3(workCorner3);
-        setCorner4(workCorner4);
-        setDeckId(data.deck_id);
-        setMessage('Draw card');
-        setEndOfGame(false);
-      });
-    }; 
+          // load computer's hand
+          for (i = 7; i < 14; i++) {
+            sortCard = calcSortCard(data.cards[i].value);
+            handEntry = {
+              cardImage: data.cards[i].image,
+              sortCard: sortCard,
+              code: data.cards[i].code,
+            };
+            workHandPC.push(handEntry);
+          }
+          //  load Side Pile's
+          for (i = 14; i < 18; i++) {
+            sortCard = calcSortCard(data.cards[i].value);
+            handEntry = {
+              cardImage: data.cards[i].image,
+              sortCard: sortCard,
+              code: data.cards[i].code,
+            };
+            if (i === 14) {
+              workSide1.push(handEntry);
+            } else if (i === 15) {
+              workSide2.push(handEntry);
+            } else if (i === 16) {
+              workSide3.push(handEntry);
+            } else if (i === 17) {
+              workSide4.push(handEntry);
+            }
+          }
+          // update state
+          setHand(workHand);
+          setHandPC(workHandPC);
+          setSide1(workSide1);
+          setSide2(workSide2);
+          setSide3(workSide3);
+          setSide4(workSide4);
+          setCorner1(workCorner1);
+          setCorner2(workCorner2);
+          setCorner3(workCorner3);
+          setCorner4(workCorner4);
+          setDeckId(data.deck_id);
+          setMessage('Draw card');
+          setEndOfGame(false);
+        });
+    }
   }, []);
 
   // useEffect - Get 18 cards from deck and place on playing board
