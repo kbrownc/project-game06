@@ -53,7 +53,6 @@ function App() {
         sortCard: sortCard,
         code: fullDeck[workCardsUsed].code,
       };
-      console.log('cardsUsed onDraw', workCardsUsed, fullDeck[workCardsUsed].code);
       changedHand.push(handEntry);
       setHand(changedHand);
       setMessage('Card drawn');
@@ -79,7 +78,7 @@ function App() {
           setMessage('Card drawn');
         });
     }
-  }, [deckId, hand]);
+  }, [deckId, hand, cardsUsed, useTestBed]);
 
   // Move a card (includes a dynamic function)
   const moveCard = (source, target, sourceIndex) => {
@@ -106,7 +105,7 @@ function App() {
       source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
       sourceBlack !== targetBlack
     ) {
-      console.log('onTurnDone card moved', source[sourceIndex].code, 'to', name, target);
+      console.log('3 onTurnDone card moved', source[sourceIndex].code, 'to', name, target);
       moveCard(source, target, sourceIndex);
       cardsMoved = true;
       if (sourceIndex > 0) {
@@ -121,11 +120,13 @@ function App() {
     let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
     let targetBlack =
       target[target.length - 1].code.includes('C') || target[target.length - 1].code.includes('S');
+    console.log('suit',sourceBlack,source[sourceIndex].code,targetBlack,target[target.length - 1].code);
     if (source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
       sourceBlack !== targetBlack) {
+      console.log('values',sourceBlack,targetBlack,source[sourceIndex].sortCard + 1,target[target.length - 1].sortCard)
       let i = 0;
       for (i = 0; i < source.length; i++) {
-        console.log('onTurnDone cardPile moved', source[i].code, target);
+        console.log('4 onTurnDone cardPile moved', source[i].code, target);
         moveCard(source, target, i);
       }
       cardsMoved = true;
@@ -162,9 +163,10 @@ function App() {
       .then(data => {
         let handEntry = {},
           sortCard = 0;
-        let workCardsUsed = cardsUsed + 1;
+        let workCardsUsed = cardsUsed;
         if (useTestBed) {
-          if (cardsUsed === 52) console.error('no cards left in deck');
+          if (cardsUsed === 52) {console.error('no cards left in deck');}
+          workCardsUsed = workCardsUsed + 1;
           sortCard = calcSortCard(fullDeck[workCardsUsed].sortCard);
           handEntry = {
             cardImage: fullDeck[workCardsUsed].cardImage,
@@ -189,24 +191,24 @@ function App() {
       .catch(error => {
         setMessage('Network error - Try again');
       });
-  }, [deckId]);
+  }, [deckId, cardsUsed, useTestBed]);
 
   // Player's Turn complete - Computer's turn
   //
   const onTurnDone = useCallback(() => {
-    let changedHandPC = handPC.slice();
-    let changedCorner1 = corner1.slice();
-    let changedCorner2 = corner2.slice();
-    let changedCorner3 = corner3.slice();
-    let changedCorner4 = corner4.slice();
-    let changedSide1 = side1.slice();
-    let changedSide2 = side2.slice();
-    let changedSide3 = side3.slice();
-    let changedSide4 = side4.slice();
+    let changedHandPC = JSON.parse(JSON.stringify(handPC));
+    let changedCorner1 = JSON.parse(JSON.stringify(corner1));
+    let changedCorner2 = JSON.parse(JSON.stringify(corner2));
+    let changedCorner3 = JSON.parse(JSON.stringify(corner3));
+    let changedCorner4 = JSON.parse(JSON.stringify(corner4));
+    let changedSide1 = JSON.parse(JSON.stringify(side1));
+    let changedSide2 = JSON.parse(JSON.stringify(side2));
+    let changedSide3 = JSON.parse(JSON.stringify(side3));
+    let changedSide4 = JSON.parse(JSON.stringify(side4));
     // Draw Card
     drawCard().then(handEntry => {
       changedHandPC.push(handEntry);
-      console.log('onTurnDone card added', handEntry.code,changedHandPC);
+      console.log('1 onTurnDone card added', handEntry.code,changedHandPC);
 
       // Loop until no King's in handPC
       // If King is found in handPC, move to next available corner
@@ -216,16 +218,16 @@ function App() {
         kingPresent = changedHandPC[i].code.indexOf('K');
         if (kingPresent !== -1) {
           if (changedCorner1.length === 0) {
-            console.log('onTurnDone card moved', changedHandPC[i].code);
+            console.log('2 onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner1, i);
           } else if (changedCorner2.length === 0) {
-            console.log('onTurnDone card moved', changedHandPC[i].code);
+            console.log('2 onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner2, i);
           } else if (changedCorner3.length === 0) {
-            console.log('onTurnDone card moved', changedHandPC[i].code);
+            console.log('2 onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner3, i);
           } else {
-            console.log('onTurnDone card moved', changedHandPC[i].code);
+            console.log('2 onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner4, i);
           }
           // Decrement i if a card has been moved to pickup next card
@@ -273,7 +275,7 @@ function App() {
         if (changedSide1.length > 0 && changedSide2.length > 0) {
           cardsMoved = checkForMovePile(changedSide2, changedSide1, 0, cardsMoved);
           if (cardsMoved) {
-            console.log('onTurnDone card moved fill empty slot', changedHandPC[0].code, 'to changeSide2');
+            console.log('5 onTurnDone card moved fill empty slot', changedHandPC[0].code, 'to changeSide2');
             moveCard(changedHandPC, changedSide2, 0);
 
             // NEW: move to handle addition of card to empty pile  >>>>>>>>>>>>>>>>
@@ -297,7 +299,8 @@ function App() {
         if (changedSide1.length > 0 && changedSide3.length > 0) {
           cardsMoved = checkForMovePile(changedSide3, changedSide1, 0, cardsMoved);
           if (cardsMoved) {
-            console.log('onTurnDone card moved fill empty slot', changedHandPC[0].code, 'to changeSide3',changedSide3);
+            console.log('5 onTurnDone card moved fill empty slot', changedHandPC[0].code, 'to changeSide3',changedSide3);
+            //if (changedHandPC[0].code !== '8D') moveCard(changedHandPC, changedSide3, 0);
             moveCard(changedHandPC, changedSide3, 0);
             workMessage = endOfGameCheck(changedHandPC);
             cardsMoved = false;
@@ -307,7 +310,7 @@ function App() {
         if (changedSide1.length > 0 && changedSide4.length > 0) {
           cardsMoved = checkForMovePile(changedSide4, changedSide1, 0, cardsMoved);
           if (cardsMoved) {
-            console.log('onTurnDone card moved fill empty slot', changedHandPC[0].code, 'to changeSide4');
+            console.log('5 onTurnDone card moved fill empty slot', changedHandPC[0].code, 'to changeSide4');
             moveCard(changedHandPC, changedSide4, 0);
             workMessage = endOfGameCheck(changedHandPC);
             cardsMoved = false;
@@ -565,7 +568,7 @@ function App() {
           setEndOfGame(false);
         });
     }
-  }, []);
+  }, [useTestBed]);
 
   // useEffect - Get 18 cards from deck and place on playing board
   useEffect(() => {
