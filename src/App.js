@@ -92,12 +92,10 @@ function App() {
 
   // Move a card
   const moveCard = (source, target, sourceIndex) => {
-    console.log('***moveCard Starts');
     let add = source.slice(sourceIndex, sourceIndex + 1);
     source.splice(sourceIndex, 1);
     target.splice(target.length, 0, ...add);
-    console.log('moveCard ***', 'add', add, 'source', { ...source }, 'target', { ...target });
-    console.log('***moveCard Ends');
+    console.log('moveCard', { ...add[0].code }, { ...source }, { ...target });
   };
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
@@ -115,7 +113,6 @@ function App() {
       source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
       sourceBlack !== targetBlack
     ) {
-      console.log('3 onTurnDone card moved', { ...source[sourceIndex].code }, 'to', name, { ...target });
       moveCard(source, target, sourceIndex);
       cardsMoved = true;
       if (sourceIndex > 0) {
@@ -127,18 +124,15 @@ function App() {
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
   const checkForMovePile = (source, target, sourceIndex, cardsMoved) => {
-    console.log('**checkForMovePile Starts');
     let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
     let targetBlack =
       target[target.length - 1].code.includes('C') || target[target.length - 1].code.includes('S');
-    //console.log('suit', sourceBlack, {...source[sourceIndex].code}, targetBlack, {...target[target.length - 1].code});
     if (
       source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
       sourceBlack !== targetBlack
     ) {
       let i = 0;
       for (i = 0; i < source.length; i++) {
-        console.log('4 onTurnDone cardPile moved', { ...source[i].code }, { ...target });
         moveCard(source, target, i);
         i = i - 1;
       }
@@ -146,7 +140,6 @@ function App() {
     } else {
       cardsMoved = false;
     }
-    console.log('**checkForMovePile Ends');
     return cardsMoved;
   };
 
@@ -233,16 +226,12 @@ function App() {
         kingPresent = changedHandPC[i].code.indexOf('K');
         if (kingPresent !== -1) {
           if (changedCorner1.length === 0) {
-            console.log('2 onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner1, i);
           } else if (changedCorner2.length === 0) {
-            console.log('2 onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner2, i);
           } else if (changedCorner3.length === 0) {
-            console.log('2 onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner3, i);
           } else {
-            console.log('2 onTurnDone card moved', changedHandPC[i].code);
             moveCard(changedHandPC, changedCorner4, i);
           }
           // Decrement i if a card has been moved to pickup next card
@@ -252,7 +241,6 @@ function App() {
         }
       }
       // Check to see if a card from handPC can be moved to Side1-4 or Corner1-4 and move card
-      console.log('++++++++++++Move single cards starts here');
       i = 0;
       let cardsMoved = false;
       for (i = 0; i < changedHandPC.length; i++) {
@@ -275,7 +263,6 @@ function App() {
       // Check for end of game
       let workMessage = endOfGameCheck(changedHandPC);
 
-      console.log('++++++++++++Moves piles starts here');
       // TODO:
       // -Check to see if entire Side1-4 piles can be moved to corner1-4 or to another Side
       //
@@ -289,8 +276,6 @@ function App() {
       // break (exits loop)
       cardsMoved = false;
       while (true) {
-        console.log('-----------start loop again');
-        console.log('Starting position: Side1 Side3 handPC', {...changedSide1}, {...changedSide3}, {...changedHandPC});
         if (changedSide1.length > 0 && changedSide2.length > 0) {
           console.log('-----Side2 Side1');
           cardsMoved = checkForMovePile(changedSide2, changedSide1, 0, cardsMoved);
@@ -316,18 +301,10 @@ function App() {
           }
         }
         if (changedSide1.length > 0 && changedSide3.length > 0) {
-          console.log('before-----Side3 Side1', { ...changedSide3 }, { ...changedSide1 }, { ...cardsMoved });
+          console.log('-----Side3 Side1');
           cardsMoved = checkForMovePile(changedSide3, changedSide1, 0, cardsMoved);
-          console.log('after -----Side3 Side1', { ...changedSide3 }, { ...changedSide1 }, { ...cardsMoved });
           if (cardsMoved) {
-            console.log(
-              '5 onTurnDone card moved fill empty slot',
-              { ...changedHandPC[0].code },
-              'to changeSide3',
-              {...changedSide3}
-            );
             moveCard(changedHandPC, changedSide3, 0);
-            //if (changedHandPC[0].code === '8D') debugger;
             workMessage = endOfGameCheck(changedHandPC);
             cardsMoved = false;
             continue;
@@ -345,7 +322,6 @@ function App() {
         }
         break;
       }
-      console.log('++++++++++++Moves piles ends here');
 
       setHandPC(changedHandPC);
       setCorner1(changedCorner1);
