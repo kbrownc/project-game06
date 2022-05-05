@@ -95,11 +95,11 @@ function App() {
     let add = source.slice(sourceIndex, sourceIndex + 1);
     source.splice(sourceIndex, 1);
     target.splice(target.length, 0, ...add);
-    console.log('moveCard', { ...add[0].code }, { ...source }, { ...target });
+    console.log('moveCard', { ...add[0].code }, { ...target });
   };
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
-  const checkForMove = (source, target, sourceIndex, cardsMoved, name) => {
+  const checkForMove = (source, target, sourceIndex, cardsMoved) => {
     let index = sourceIndex;
     if (source.length === 0) return;
     let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
@@ -245,14 +245,14 @@ function App() {
       let cardsMoved = false;
       for (i = 0; i < changedHandPC.length; i++) {
         // find out if card is 1 less and color of cards are different
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide1, i, cardsMoved, 'changedSide1');
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved, 'changedSide2');
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide3, i, cardsMoved, 'changedSide3');
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide4, i, cardsMoved, 'changedSide4');
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner1, i, cardsMoved, 'changedCorner1');
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner2, i, cardsMoved, 'changedCorner2');
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner3, i, cardsMoved, 'changedCorner3');
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner4, i, cardsMoved, 'changedCorner4');
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide1, i, cardsMoved);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide3, i, cardsMoved);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide4, i, cardsMoved);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner1, i, cardsMoved);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner2, i, cardsMoved);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner3, i, cardsMoved);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner4, i, cardsMoved);
         // if a card was moved, start main loop over
         if (changedHandPC.length > 0 && cardsMoved) {
           i = -1;
