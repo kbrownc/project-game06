@@ -95,7 +95,7 @@ function App() {
     let add = source.slice(sourceIndex, sourceIndex + 1);
     source.splice(sourceIndex, 1);
     target.splice(target.length, 0, ...add);
-    console.log('moveCard', { ...add[0].code }, { ...target });
+    console.log('moveCard', {...add[0].code}, { ...target });
   };
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
@@ -309,16 +309,171 @@ function App() {
           cardsMoved = false;
           continue;
         }
-
         console.log('-----Side3 Side1');
         [workMessage, cardsMoved] = movePile(changedSide3, changedSide1, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        
         console.log('-----Side4 Side1');
         [workMessage, cardsMoved] = movePile(changedSide4, changedSide1, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+
+        console.log('-----Side1 Side2');
+        [workMessage, cardsMoved] = movePile(changedSide1, changedSide2, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side3 Side2');
+        [workMessage, cardsMoved] = movePile(changedSide3, changedSide2, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side4 Side2');
+        [workMessage, cardsMoved] = movePile(changedSide4, changedSide2, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+
+        console.log('-----Side1 Side3');
+        [workMessage, cardsMoved] = movePile(changedSide1, changedSide3, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side2 Side3');
+        [workMessage, cardsMoved] = movePile(changedSide2, changedSide3, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side4 Side3');
+        [workMessage, cardsMoved] = movePile(changedSide4, changedSide3, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+
+        console.log('-----Side1 Side4');
+        [workMessage, cardsMoved] = movePile(changedSide1, changedSide4, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side2 Side4');
+        [workMessage, cardsMoved] = movePile(changedSide2, changedSide4, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side3 Side4');
+        [workMessage, cardsMoved] = movePile(changedSide3, changedSide4, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+
+        console.log('-----Side1 Corner1');
+        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner1, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side2 Corner1');
+        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner1, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side3 Corner1');
+        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner1, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side4 Corner1');
+        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner1, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+
+        console.log('-----Side1 Corner2');
+        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner2, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side2 Corner2');
+        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner2, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side3 Corner2');
+        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner2, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side4 Corner2');
+        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner2, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+
+        console.log('-----Side1 Corner3');
+        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner3, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side2 Corner3');
+        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner3, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side3 Corner3');
+        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner3, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side4 Corner3');
+        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner3, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+
+        console.log('-----Side1 Corner4');
+        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner4, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side2 Corner4');
+        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner4, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side3 Corner4');
+        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner4, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        console.log('-----Side4 Corner4');
+        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner4, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
