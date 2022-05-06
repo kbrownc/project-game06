@@ -143,6 +143,33 @@ function App() {
     return cardsMoved;
   };
 
+  // move a pile
+  const movePile = (source, target, changedHandPC, cardsMoved) => {
+    let workMessage = 'Draw card';
+    if (target.length > 0 && source.length > 0) {
+      cardsMoved = checkForMovePile(source, target, 0, cardsMoved);
+      if (cardsMoved) {
+        moveCard(changedHandPC, source, 0);
+
+        // NEW: move to handle addition of card to empty pile  >>>>>>>>>>>>>>>>
+        // i = 0;
+        // let cardsMoved = false;
+        // for (i = 0; i < changedHandPC.length; i++) {
+        //   [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
+        //   if (changedHandPC.length === 0) break;
+        //   if (cardsMoved) {
+        //     i = -1;
+        //     cardsMoved = false;
+        //   }
+        // }
+        // NEW END
+
+        workMessage = endOfGameCheck(changedHandPC);
+      }
+    }
+    return [workMessage, cardsMoved];
+  };
+
   // End of Game Check
   const endOfGameCheck = hand => {
     let workMessage = '';
@@ -268,7 +295,7 @@ function App() {
       //
       // if low card side1(changedSide1[length - 1]) is 1 more and opposite color of high card side2(changedSide2[0])
       //    move entire side2 to side1
-      //    move any card from changedHandPC to changedSide2
+      //    move 1st card from changedHandPC to changedSide2
       //    check if card just played can be built on again from changedHandPC (repeat until cannot play) ??????????
       //    checkEndOfGame
       //    start over - continue (stops processing of current loop and starts loop again)
@@ -276,50 +303,27 @@ function App() {
       // break (exits loop)
       cardsMoved = false;
       while (true) {
-        if (changedSide1.length > 0 && changedSide2.length > 0) {
-          console.log('-----Side2 Side1');
-          cardsMoved = checkForMovePile(changedSide2, changedSide1, 0, cardsMoved);
-          if (cardsMoved) {
-            moveCard(changedHandPC, changedSide2, 0);
+        console.log('-----Side2 Side1');
+        [workMessage, cardsMoved] = movePile(changedSide2, changedSide1, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
 
-            // NEW: move to handle addition of card to empty pile  >>>>>>>>>>>>>>>>
-            // i = 0;
-            // let cardsMoved = false;
-            // for (i = 0; i < changedHandPC.length; i++) {
-            //   [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
-            //   if (changedHandPC.length === 0) break;
-            //   if (cardsMoved) {
-            //     i = -1;
-            //     cardsMoved = false;
-            //   }
-            // }
-            // NEW END
+        console.log('-----Side3 Side1');
+        [workMessage, cardsMoved] = movePile(changedSide3, changedSide1, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
+        
+        console.log('-----Side4 Side1');
+        [workMessage, cardsMoved] = movePile(changedSide4, changedSide1, changedHandPC, cardsMoved);
+        if (cardsMoved) {
+          cardsMoved = false;
+          continue;
+        }
 
-            workMessage = endOfGameCheck(changedHandPC);
-            cardsMoved = false;
-            continue;
-          }
-        }
-        if (changedSide1.length > 0 && changedSide3.length > 0) {
-          console.log('-----Side3 Side1');
-          cardsMoved = checkForMovePile(changedSide3, changedSide1, 0, cardsMoved);
-          if (cardsMoved) {
-            moveCard(changedHandPC, changedSide3, 0);
-            workMessage = endOfGameCheck(changedHandPC);
-            cardsMoved = false;
-            continue;
-          }
-        }
-        if (changedSide1.length > 0 && changedSide4.length > 0) {
-          console.log('-----Side4 Side1');
-          cardsMoved = checkForMovePile(changedSide4, changedSide1, 0, cardsMoved);
-          if (cardsMoved) {
-            moveCard(changedHandPC, changedSide4, 0);
-            workMessage = endOfGameCheck(changedHandPC);
-            cardsMoved = false;
-            continue;
-          }
-        }
         break;
       }
 
