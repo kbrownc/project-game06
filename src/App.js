@@ -10,9 +10,9 @@ function App() {
   const urlGetDraw = 'https://deckofcardsapi.com/api/deck/new/draw/?count=18';
 
   // State
-  const [useTestBed, setUseTestBed] = useState(true);
+  const [useTestBed, setUseTestBed] = useState(false);
 
-  const [cardsUsed, setCardsUsed] = useState(0);
+  const [cardsRem, setCardsRem] = useState(52);
   const [message, setMessage] = useState('Draw card');
   const [endOfGame, setEndOfGame] = useState(false);
   const [side1, setSide1] = useState([]);
@@ -40,23 +40,23 @@ function App() {
   const onDraw = useCallback(() => {
     let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
     if (useTestBed) {
-      if (cardsUsed === 52) {
+      if (cardsRem === 0) {
         console.error('no cards left in deck');
       }
-      let workCardsUsed = cardsUsed + 1;
+      let workCardsRem = cardsRem - 1;
       let changedHand = hand.slice();
       let handEntry = {},
         sortCard = 0;
-      sortCard = calcSortCard(fullDeck[workCardsUsed].sortCard);
+      sortCard = calcSortCard(fullDeck[52 - workCardsRem].sortCard);
       handEntry = {
-        cardImage: fullDeck[workCardsUsed].cardImage,
+        cardImage: fullDeck[52 - workCardsRem].cardImage,
         sortCard: sortCard,
-        code: fullDeck[workCardsUsed].code,
+        code: fullDeck[52 - workCardsRem].code,
       };
       changedHand.push(handEntry);
       setHand(changedHand);
       setMessage('Card drawn');
-      setCardsUsed(workCardsUsed);
+      setCardsRem(workCardsRem);
     } else {
       fetch(urlDrawHand2)
         .then(response => response.json())
@@ -75,10 +75,11 @@ function App() {
           };
           changedHand.push(handEntry);
           setHand(changedHand);
+          setCardsRem(data.remaining);
           setMessage('Card drawn');
         });
     }
-  }, [deckId, hand, cardsUsed, useTestBed]);
+  }, [deckId, hand, cardsRem, useTestBed]);
 
   // Move a card (includes a dynamic function)
   // const moveCard = (source, target, sourceIndex) => {
@@ -95,7 +96,7 @@ function App() {
     let add = source.slice(sourceIndex, sourceIndex + 1);
     source.splice(sourceIndex, 1);
     target.splice(target.length, 0, ...add);
-    console.log('moveCard', {...add[0].code}, { ...target });
+    console.log('moveCard', { ...add}, { ...target });
   };
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
@@ -197,19 +198,19 @@ function App() {
       .then(data => {
         let handEntry = {},
           sortCard = 0;
-        let workCardsUsed = cardsUsed;
+        let workCardsRem = cardsRem;
         if (useTestBed) {
-          if (cardsUsed === 52) {
+          if (cardsRem === 0) {
             console.error('no cards left in deck');
           }
-          workCardsUsed = workCardsUsed + 1;
-          sortCard = calcSortCard(fullDeck[workCardsUsed].sortCard);
+          workCardsRem = workCardsRem - 1;
+          sortCard = calcSortCard(fullDeck[52 - workCardsRem].sortCard);
           handEntry = {
-            cardImage: fullDeck[workCardsUsed].cardImage,
+            cardImage: fullDeck[52 - workCardsRem].cardImage,
             sortCard: sortCard,
-            code: fullDeck[workCardsUsed].code,
+            code: fullDeck[52 - workCardsRem].code,
           };
-          setCardsUsed(workCardsUsed);
+          setCardsRem(workCardsRem);
         } else {
           if (data.remaining === 0) {
             console.error('no cards left in deck');
@@ -221,13 +222,14 @@ function App() {
             code: data.cards[0].code,
           };
         }
+        setCardsRem(data.remaining);
         setMessage('Draw card');
         return handEntry;
       })
       .catch(error => {
         setMessage('Network error - Try again');
       });
-  }, [deckId, cardsUsed, useTestBed]);
+  }, [deckId, cardsRem, useTestBed]);
 
   // Player's Turn complete - Computer's turn
   //
@@ -478,7 +480,7 @@ function App() {
           cardsMoved = false;
           continue;
         }
-
+        // Jump out of the infinite loop
         break;
       }
 
@@ -504,7 +506,7 @@ function App() {
     corner4,
     endOfGameCheck,
     checkForMove,
-    checkForMovePile,
+    movePile,
     side1,
     side2,
     side3,
@@ -645,7 +647,7 @@ function App() {
         }
       }
       // update state
-      setCardsUsed(17);
+      setCardsRem(52 - 17);
       setHand(workHand);
       setHandPC(workHandPC);
       setSide1(workSide1);
@@ -726,6 +728,7 @@ function App() {
           setCorner3(workCorner3);
           setCorner4(workCorner4);
           setDeckId(data.deck_id);
+          setCardsRem(data.remaining);
           setMessage('Draw card');
           setEndOfGame(false);
         });
@@ -882,6 +885,9 @@ function App() {
           </div>
           <div className="Box Button" onClick={onAbout}>
             About
+          </div>
+          <div className="Box2">
+            Cards Remaining: {cardsRem}
           </div>
         </div>
         <div className="Messages">
