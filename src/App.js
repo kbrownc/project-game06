@@ -13,7 +13,7 @@ function App() {
   const [useTestBed, setUseTestBed] = useState(false);
 
   const [cardsRem, setCardsRem] = useState(52);
-  const [message, setMessage] = useState('Draw card');
+  const [message, setMessage] = useState('Draw a card');
   const [endOfGame, setEndOfGame] = useState(false);
   const [side1, setSide1] = useState([]);
   const [side2, setSide2] = useState([]);
@@ -55,7 +55,7 @@ function App() {
       };
       changedHand.push(handEntry);
       setHand(changedHand);
-      setMessage('Card drawn');
+      setMessage('Move a card');
       setCardsRem(workCardsRem);
     } else {
       fetch(urlDrawHand2)
@@ -76,7 +76,7 @@ function App() {
           changedHand.push(handEntry);
           setHand(changedHand);
           setCardsRem(data.remaining);
-          setMessage('Card drawn');
+          setMessage('Move a card');
         });
     }
   }, [deckId, hand, cardsRem, useTestBed]);
@@ -96,7 +96,7 @@ function App() {
     let add = source.slice(sourceIndex, sourceIndex + 1);
     source.splice(sourceIndex, 1);
     target.splice(target.length, 0, ...add);
-    console.log('moveCard', { ...add}, { ...target });
+    console.log('moveCard', { ...add }, { ...target });
   };
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
@@ -146,7 +146,7 @@ function App() {
 
   // move a pile
   const movePile = (source, target, changedHandPC, cardsMoved) => {
-    let workMessage = 'Draw card';
+    let workMessage = 'Your turn';
     if (target.length > 0 && source.length > 0) {
       cardsMoved = checkForMovePile(source, target, 0, cardsMoved);
       if (cardsMoved) {
@@ -173,14 +173,11 @@ function App() {
 
   // End of Game Check
   const endOfGameCheck = hand => {
-    let workMessage = '';
+    let workMessage = 'Your turn';
     if (hand.length === 0) {
       workMessage = 'end of game';
       setEndOfGame(true);
       console.error('end of game');
-    } else {
-      workMessage = 'draw a card';
-      console.error('NOT end of game');
     }
     return workMessage;
   };
@@ -886,9 +883,7 @@ function App() {
           <div className="Box Button" onClick={onAbout}>
             About
           </div>
-          <div className="Box2">
-            Cards Remaining: {cardsRem}
-          </div>
+          <div className="Box2">Cards Remaining: {cardsRem}</div>
         </div>
         <div className="Messages">
           <span>{message}</span>
