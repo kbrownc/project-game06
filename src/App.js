@@ -40,15 +40,16 @@ function App() {
   const onDraw = useCallback(() => {
     let urlDrawHand2 = urlDrawHand.replace('<<deck_id>>', deckId);
     if (useTestBed) {
-      if (cardsRem === 0) {
-        console.error('no cards left in deck');
+      let workMessage = '';
+      if (cardsRem === 1) {
+        workMessage = 'no cards left in deck';
+        setEndOfGame(true);
       }
       let workCardsRem = cardsRem - 1;
       let changedHand = hand.slice();
       let handEntry = {},
         sortCard = 0;
       sortCard = calcSortCard(fullDeck[51 - workCardsRem].sortCard);
-      console.log('end of deck - onDraw',fullDeck[51 - workCardsRem]);
       handEntry = {
         cardImage: fullDeck[51 - workCardsRem].cardImage,
         sortCard: sortCard,
@@ -56,14 +57,19 @@ function App() {
       };
       changedHand.push(handEntry);
       setHand(changedHand);
-      setMessage('Move a card');
+      if (workMessage === '') {
+        workMessage = 'Move a Card';
+      }
+      setMessage(workMessage);
       setCardsRem(workCardsRem);
     } else {
       fetch(urlDrawHand2)
         .then(response => response.json())
         .then(data => {
+          let workMessage = '';
           if (data.remaining === 0) {
-            console.error('no cards left in deck');
+            workMessage = 'no cards left in deck';
+            setEndOfGame(true);
           }
           let changedHand = hand.slice();
           let handEntry = {},
@@ -77,7 +83,10 @@ function App() {
           changedHand.push(handEntry);
           setHand(changedHand);
           setCardsRem(data.remaining);
-          setMessage('Move a card');
+          if (workMessage === '') {
+            workMessage = 'Move a Card';
+          }
+          setMessage(workMessage);
         });
     }
   }, [deckId, hand, cardsRem, useTestBed]);
@@ -97,7 +106,7 @@ function App() {
     let add = source.slice(sourceIndex, sourceIndex + 1);
     source.splice(sourceIndex, 1);
     target.splice(target.length, 0, ...add);
-    console.log('moveCard', { ...add }, { ...target });
+    //console.log('moveCard', { ...add }, { ...target });
   };
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
@@ -147,7 +156,7 @@ function App() {
 
   // move a pile
   const movePile = (source, target, changedHandPC, cardsMoved) => {
-    let workMessage = 'Your turn';
+    let workMessage = '';
     if (target.length > 0 && source.length > 0) {
       cardsMoved = checkForMovePile(source, target, 0, cardsMoved);
       if (cardsMoved) {
@@ -196,15 +205,15 @@ function App() {
       .then(data => {
         let handEntry = {},
           sortCard = 0;
+        let workMessage = '';
         if (useTestBed) {
           let workCardsRem = cardsRem;
-          if (cardsRem === 0) {
-            console.error('no cards left in deck');
+          if (cardsRem === 1) {
+            workMessage = 'no cards left in deck';
             setEndOfGame(true);
           }
           workCardsRem = workCardsRem - 1;
           sortCard = calcSortCard(fullDeck[51 - workCardsRem].sortCard);
-          console.log('end of Deck - drawcard',fullDeck[51 - workCardsRem]);
           handEntry = {
             cardImage: fullDeck[51 - workCardsRem].cardImage,
             sortCard: sortCard,
@@ -213,7 +222,7 @@ function App() {
           setCardsRem(workCardsRem);
         } else {
           if (data.remaining === 0) {
-            console.error('no cards left in deck');
+            workMessage = 'no cards left in deck';
             setEndOfGame(true);
           }
           sortCard = calcSortCard(data.cards[0].value);
@@ -224,11 +233,12 @@ function App() {
           };
           setCardsRem(data.remaining);
         }
-        setMessage('Draw card');
-        return handEntry;
+        return [handEntry, workMessage];
       })
       .catch(error => {
-        setMessage('Network error - Try again');
+        let workMessage = 'Network error - Try again';
+        let handEntry = {};
+        return [handEntry, workMessage];
       });
   }, [deckId, cardsRem, useTestBed]);
 
@@ -245,7 +255,7 @@ function App() {
     let changedSide3 = JSON.parse(JSON.stringify(side3));
     let changedSide4 = JSON.parse(JSON.stringify(side4));
     // Draw Card
-    drawCard().then(handEntry => {
+    drawCard().then(([handEntry, workMessage]) => {
       changedHandPC.push(handEntry);
 
       // Loop until no King's in handPC
@@ -253,7 +263,6 @@ function App() {
       let i = 0;
       let kingPresent = 0;
       for (i = 0; i < changedHandPC.length; i++) {
-        console.log('bug searching',i,{...changedHandPC});
         kingPresent = changedHandPC[i].code.indexOf('K');
         if (kingPresent !== -1) {
           if (changedCorner1.length === 0) {
@@ -292,7 +301,7 @@ function App() {
       }
 
       // Check for end of game
-      let workMessage = endOfGameCheck(changedHandPC);
+      if (workMessage === '') {workMessage = endOfGameCheck(changedHandPC)};
 
       // TODO:
       // -Check to see if entire Side1-4 piles can be moved to corner1-4 or to another Side
@@ -307,6 +316,7 @@ function App() {
       // break (exits loop)
       cardsMoved = false;
       while (true) {
+        if (workMessage !== '') break;
         console.log('-----Side2 Side1');
         [workMessage, cardsMoved] = movePile(changedSide2, changedSide1, changedHandPC, cardsMoved);
         if (cardsMoved) {
@@ -482,8 +492,12 @@ function App() {
           cardsMoved = false;
           continue;
         }
+        console.log('workMessage 2',workMessage);
         // Jump out of the infinite loop
         break;
+      }
+      if (workMessage === '') {
+        workMessage = 'Draw a card player';
       }
 
       setHandPC(changedHandPC);
@@ -613,7 +627,6 @@ function App() {
       // load player's hand
       for (i = 0; i < 7; i++) {
         sortCard = calcSortCard(fullDeck[i].sortCard);
-        console.log('end of deck - boardsetup',fullDeck[i]);
         handEntry = {
           cardImage: fullDeck[i].cardImage,
           sortCard: sortCard,
