@@ -10,9 +10,9 @@ function App() {
   const urlGetDraw = 'https://deckofcardsapi.com/api/deck/new/draw/?count=18';
 
   // State
-  const [useTestBed, setUseTestBed] = useState(false);
+  const [useTestBed, setUseTestBed] = useState(true);
 
-  const [cardsRem, setCardsRem] = useState(52);
+  const [cardsRem, setCardsRem] = useState(51);
   const [message, setMessage] = useState('Draw a card');
   const [endOfGame, setEndOfGame] = useState(false);
   const [side1, setSide1] = useState([]);
@@ -47,11 +47,12 @@ function App() {
       let changedHand = hand.slice();
       let handEntry = {},
         sortCard = 0;
-      sortCard = calcSortCard(fullDeck[52 - workCardsRem].sortCard);
+      sortCard = calcSortCard(fullDeck[51 - workCardsRem].sortCard);
+      console.log('end of deck - onDraw',fullDeck[51 - workCardsRem]);
       handEntry = {
-        cardImage: fullDeck[52 - workCardsRem].cardImage,
+        cardImage: fullDeck[51 - workCardsRem].cardImage,
         sortCard: sortCard,
-        code: fullDeck[52 - workCardsRem].code,
+        code: fullDeck[51 - workCardsRem].code,
       };
       changedHand.push(handEntry);
       setHand(changedHand);
@@ -195,22 +196,25 @@ function App() {
       .then(data => {
         let handEntry = {},
           sortCard = 0;
-        let workCardsRem = cardsRem;
         if (useTestBed) {
+          let workCardsRem = cardsRem;
           if (cardsRem === 0) {
             console.error('no cards left in deck');
+            setEndOfGame(true);
           }
           workCardsRem = workCardsRem - 1;
-          sortCard = calcSortCard(fullDeck[52 - workCardsRem].sortCard);
+          sortCard = calcSortCard(fullDeck[51 - workCardsRem].sortCard);
+          console.log('end of Deck - drawcard',fullDeck[51 - workCardsRem]);
           handEntry = {
-            cardImage: fullDeck[52 - workCardsRem].cardImage,
+            cardImage: fullDeck[51 - workCardsRem].cardImage,
             sortCard: sortCard,
-            code: fullDeck[52 - workCardsRem].code,
+            code: fullDeck[51 - workCardsRem].code,
           };
           setCardsRem(workCardsRem);
         } else {
           if (data.remaining === 0) {
             console.error('no cards left in deck');
+            setEndOfGame(true);
           }
           sortCard = calcSortCard(data.cards[0].value);
           handEntry = {
@@ -218,8 +222,8 @@ function App() {
             sortCard: sortCard,
             code: data.cards[0].code,
           };
+          setCardsRem(data.remaining);
         }
-        setCardsRem(data.remaining);
         setMessage('Draw card');
         return handEntry;
       })
@@ -249,6 +253,7 @@ function App() {
       let i = 0;
       let kingPresent = 0;
       for (i = 0; i < changedHandPC.length; i++) {
+        console.log('bug searching',i,{...changedHandPC});
         kingPresent = changedHandPC[i].code.indexOf('K');
         if (kingPresent !== -1) {
           if (changedCorner1.length === 0) {
@@ -608,6 +613,7 @@ function App() {
       // load player's hand
       for (i = 0; i < 7; i++) {
         sortCard = calcSortCard(fullDeck[i].sortCard);
+        console.log('end of deck - boardsetup',fullDeck[i]);
         handEntry = {
           cardImage: fullDeck[i].cardImage,
           sortCard: sortCard,
@@ -644,7 +650,7 @@ function App() {
         }
       }
       // update state
-      setCardsRem(52 - 17);
+      setCardsRem(51 - 17);
       setHand(workHand);
       setHandPC(workHandPC);
       setSide1(workSide1);
@@ -883,7 +889,7 @@ function App() {
           <div className="Box Button" onClick={onAbout}>
             About
           </div>
-          <div className="Box2">Cards Remaining: {cardsRem}</div>
+          <div className="Box2">Cards Left: {cardsRem}</div>
         </div>
         <div className="Messages">
           <span>{message}</span>
