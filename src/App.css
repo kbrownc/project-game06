@@ -17,7 +17,7 @@
 }
 .Nav {
   display: grid;
-  grid-template-columns: repeat(5, 95px);
+  grid-template-columns: repeat(4, 95px);
   grid-template-rows: repeat(1, 20px);
   justify-content: center;
   align-items: center;
@@ -27,7 +27,7 @@
   text-align: center;
   justify-content: center;
   height: 30px;
-  width: 450px;
+  width: 280px;
   margin: auto;
   border: 1px solid black;
 }
@@ -47,7 +47,7 @@ h4 {
   background-color: lightgreen;
   visibility: visible;
   border: 1px solid black;
-  width: 80px;
+  width: 95px;
   height: 20px;
   font-size: 12px;
   font-weight: bold;

@@ -183,7 +183,7 @@ function App() {
 
   // End of Game Check
   const endOfGameCheck = hand => {
-    let workMessage = 'Your turn';
+    let workMessage = '';
     if (hand.length === 0) {
       workMessage = 'end of game';
       setEndOfGame(true);
@@ -301,7 +301,9 @@ function App() {
       }
 
       // Check for end of game
-      if (workMessage === '') {workMessage = endOfGameCheck(changedHandPC)};
+      if (workMessage === '') {
+        workMessage = endOfGameCheck(changedHandPC);
+      }
 
       // TODO:
       // -Check to see if entire Side1-4 piles can be moved to corner1-4 or to another Side
@@ -492,7 +494,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        console.log('workMessage 2',workMessage);
         // Jump out of the infinite loop
         break;
       }
@@ -890,23 +891,20 @@ function App() {
       <span className="Title">Kings Corner</span>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="Nav">
-          <div className="Box Button" onClick={onReset}>
-            Reset Game
-          </div>
           <div className={endOfGame ? 'Invisible' : 'Box Button'} onClick={onDraw}>
             Draw Card
           </div>
           <div className={endOfGame ? 'Invisible' : 'Box Button'} onClick={onTurnDone}>
             Turn Complete
           </div>
+          <div className="Box Button" onClick={onReset}>
+            Reset Game
+          </div>
           <div className="Box Button" onClick={onAbout}>
             About
           </div>
           <div className="Box2">Cards Left: {cardsRem}</div>
-        </div>
-        <div className="Messages">
-          <span>{message}</span>
-          <br></br>
+          <div className="Messages">{message}</div>
         </div>
         <div className="Nav-expand">
           <div
