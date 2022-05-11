@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import './App.css';
-import { fullDeck } from './fullDeck';
+//import { fullDeck } from './fullDeck';
+import { fullDeck } from './fullDeck2';
 
 function App() {
   // url variables
@@ -11,7 +12,7 @@ function App() {
   const urlDrawHandMulti = 'https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=numCards';
 
   // State
-  const [useTestBed, setUseTestBed] = useState(false);
+  const [useTestBed, setUseTestBed] = useState(true);
 
   const [cardsRem, setCardsRem] = useState(51);
   const [message, setMessage] = useState('Draw a card');
@@ -278,7 +279,6 @@ function App() {
               };
               kingCards.push(handEntry);
             };
-            setCardsRem(data.remaining);
           }
           return kingCards;
         })
@@ -694,7 +694,8 @@ function App() {
         };
         workHandPC.push(handEntry);
       }
-      //  load Side Pile's
+      //  load Side Pile's - move any Kinds found to corners
+      let numCards = 0;
       for (i = 14; i < 18; i++) {
         sortCard = calcSortCard(fullDeck[i].sortCard);
         handEntry = {
@@ -702,18 +703,52 @@ function App() {
           sortCard: sortCard,
           code: fullDeck[i].code,
         };
-        if (i === 14) {
-          workSide1.push(handEntry);
-        } else if (i === 15) {
-          workSide2.push(handEntry);
-        } else if (i === 16) {
-          workSide3.push(handEntry);
-        } else if (i === 17) {
-          workSide4.push(handEntry);
+        if (fullDeck[i].code.indexOf('K') === -1) {
+            if (workSide1.length === 0) {
+              workSide1.push(handEntry);
+            } else if (workSide2.length === 0) {
+              workSide2.push(handEntry);
+            } else if (workSide3.length === 0) {
+              workSide3.push(handEntry);
+            } else if (workSide4.length === 0) {
+              workSide4.push(handEntry);
+            }
+        } else {
+            numCards = numCards + 1;
+            if (workCorner1.length === 0) {
+              workCorner1.push(handEntry);
+            } else if (workCorner2.length === 0) {
+              workCorner2.push(handEntry);
+            } else if (workCorner3.length === 0) {
+              workCorner3.push(handEntry);
+            } else if (workCorner4.length === 0) {
+              workCorner4.push(handEntry);
+            }
         }
       }
+      let workCardsRem = 34;
+      if (numCards > 0) {
+          for (i = 0; i < numCards; i++) {
+            workCardsRem = workCardsRem - 1;
+            sortCard = calcSortCard(fullDeck[51 - workCardsRem].sortCard);
+            handEntry = {
+              cardImage: fullDeck[51 - workCardsRem].cardImage,
+              sortCard: sortCard,
+              code: fullDeck[51 - workCardsRem].code,
+            };
+            if (workSide4.length === 0) {
+              workSide4.push(handEntry);
+            } else if (workSide3.length === 0) {
+              workSide3.push(handEntry);
+            } else if (workSide2.length === 0) {
+              workSide2.push(handEntry);
+            } else if (workSide1.length === 0) {
+              workSide1.push(handEntry);
+            }
+          }; 
+      };
       // update state
-      setCardsRem(51 - 17);
+      setCardsRem(workCardsRem);
       setHand(workHand);
       setHandPC(workHandPC);
       setSide1(workSide1);
@@ -773,7 +808,6 @@ function App() {
               sortCard: sortCard,
               code: data.cards[i].code,
             };
-            console.log('processing side cards',i,{...handEntry.code});
             if (data.cards[i].code.indexOf('K') === -1) {
               if (workSide1.length === 0) {
                 workSide1.push(handEntry);
@@ -787,10 +821,8 @@ function App() {
             } else {
               numCards = numCards + 1;
               if (workCorner1.length === 0) {
-                console.log('filling Corner1',{...handEntry.code});
                 workCorner1.push(handEntry);
               } else if (workCorner2.length === 0) {
-                console.log('filling Corner2',{...handEntry.code});
                 workCorner2.push(handEntry);
               } else if (workCorner3.length === 0) {
                 workCorner3.push(handEntry);
@@ -800,26 +832,19 @@ function App() {
             }
           }
           if (numCards > 0) {
-            console.log('1 About to call drawMultiCard','numCards',numCards);
             drawMultiCard(data.deck_id, numCards).then(kingCards => {
-              console.log('2 returned from drawMultiCard',{...kingCards});
               for (i = 0; i < numCards; i++) {
                 if (workSide4.length === 0) {
-                  console.log('filling Side4',{...kingCards[i].code});
                   workSide4.push(kingCards[i]);
                 } else if (workSide3.length === 0) {
-                  console.log('filling Side3',{...kingCards[i].code});
                   workSide3.push(kingCards[i]);
                 } else if (workSide2.length === 0) {
-                  console.log('filling Side2',{...kingCards[i].code});
                   workSide2.push(kingCards[i]);
                 } else if (workSide1.length === 0) {
-                  console.log('filling Side1',{...kingCards[i].code});
                   workSide1.push(kingCards[i]);
                 }
               }; 
               // update state
-              console.log('update state 1');
               setHand(workHand);
               setHandPC(workHandPC);
               setSide1(workSide1);
@@ -831,13 +856,12 @@ function App() {
               setCorner3(workCorner3);
               setCorner4(workCorner4);
               setDeckId(data.deck_id);
-              setCardsRem(data.remaining);
+              setCardsRem(data.remaining - numCards);
               setMessage('Draw card');
               setEndOfGame(false); 
             });
           } else { 
           // update state
-            console.log('update state 2');
             setHand(workHand);
             setHandPC(workHandPC);
             setSide1(workSide1);
