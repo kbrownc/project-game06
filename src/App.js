@@ -8,9 +8,10 @@ function App() {
   const urlDrawHand = 'https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=1';
   const urlDrawHandTest = 'https://dog.ceo/api/breeds/image/random';
   const urlGetDraw = 'https://deckofcardsapi.com/api/deck/new/draw/?count=18';
+  const urlDrawHandMulti = 'https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=numCards';
 
   // State
-  const [useTestBed, setUseTestBed] = useState(true);
+  const [useTestBed, setUseTestBed] = useState(false);
 
   const [cardsRem, setCardsRem] = useState(51);
   const [message, setMessage] = useState('Draw a card');
@@ -241,6 +242,54 @@ function App() {
         return [handEntry, workMessage];
       });
   }, [deckId, cardsRem, useTestBed]);
+
+  // drawCard - Get 'n' cards from deck and place on Side1-4 to replace any Kings
+  const drawMultiCard = useCallback((deckId, numCards) => {
+      let urlDrawHandMulti2 = urlDrawHandMulti.replace('<<deck_id>>', deckId).replace('numCards', numCards);
+      if (useTestBed) {
+        urlDrawHandMulti2 = urlDrawHandTest;
+      }
+      return fetch(urlDrawHandMulti2)
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          let kingCards = [];
+          let handEntry = {},
+            sortCard = 0;
+          if (useTestBed) {
+            let workCardsRem = cardsRem;
+            workCardsRem = workCardsRem - 1;
+            sortCard = calcSortCard(fullDeck[51 - workCardsRem].sortCard);
+            handEntry = {
+              cardImage: fullDeck[51 - workCardsRem].cardImage,
+              sortCard: sortCard,
+              code: fullDeck[51 - workCardsRem].code,
+            };
+            setCardsRem(workCardsRem);
+          } else {
+            let i = 0;
+            for (i = 0; i < numCards; i++) {
+              sortCard = calcSortCard(data.cards[i].value);
+              handEntry = {
+                cardImage: data.cards[i].image,
+                sortCard: sortCard,
+                code: data.cards[i].code,
+              };
+              kingCards.push(handEntry);
+            };
+            setCardsRem(data.remaining);
+          }
+          return kingCards;
+        })
+        .catch(error => {
+          console.error('Network error - Try again');
+          let kingCards = [];
+          return kingCards;
+        });
+    },
+    [cardsRem, useTestBed]
+  );
 
   // Player's Turn complete - Computer's turn
   //
@@ -715,7 +764,8 @@ function App() {
             };
             workHandPC.push(handEntry);
           }
-          //  load Side Pile's
+          //  load Side Pile's (King's are moved to the Corner piles)
+          let numCards = 0;
           for (i = 14; i < 18; i++) {
             sortCard = calcSortCard(data.cards[i].value);
             handEntry = {
@@ -723,39 +773,95 @@ function App() {
               sortCard: sortCard,
               code: data.cards[i].code,
             };
-            if (i === 14) {
-              workSide1.push(handEntry);
-            } else if (i === 15) {
-              workSide2.push(handEntry);
-            } else if (i === 16) {
-              workSide3.push(handEntry);
-            } else if (i === 17) {
-              workSide4.push(handEntry);
+            console.log('processing side cards',i,{...handEntry.code});
+            if (data.cards[i].code.indexOf('K') === -1) {
+              if (workSide1.length === 0) {
+                workSide1.push(handEntry);
+              } else if (workSide2.length === 0) {
+                workSide2.push(handEntry);
+              } else if (workSide3.length === 0) {
+                workSide3.push(handEntry);
+              } else if (workSide4.length === 0) {
+                workSide4.push(handEntry);
+              }
+            } else {
+              numCards = numCards + 1;
+              if (workCorner1.length === 0) {
+                console.log('filling Corner1',{...handEntry.code});
+                workCorner1.push(handEntry);
+              } else if (workCorner2.length === 0) {
+                console.log('filling Corner2',{...handEntry.code});
+                workCorner2.push(handEntry);
+              } else if (workCorner3.length === 0) {
+                workCorner3.push(handEntry);
+              } else if (workCorner4.length === 0) {
+                workCorner4.push(handEntry);
+              }
             }
           }
+          if (numCards > 0) {
+            console.log('1 About to call drawMultiCard','numCards',numCards);
+            drawMultiCard(data.deck_id, numCards).then(kingCards => {
+              console.log('2 returned from drawMultiCard',{...kingCards});
+              for (i = 0; i < numCards; i++) {
+                if (workSide4.length === 0) {
+                  console.log('filling Side4',{...kingCards[i].code});
+                  workSide4.push(kingCards[i]);
+                } else if (workSide3.length === 0) {
+                  console.log('filling Side3',{...kingCards[i].code});
+                  workSide3.push(kingCards[i]);
+                } else if (workSide2.length === 0) {
+                  console.log('filling Side2',{...kingCards[i].code});
+                  workSide2.push(kingCards[i]);
+                } else if (workSide1.length === 0) {
+                  console.log('filling Side1',{...kingCards[i].code});
+                  workSide1.push(kingCards[i]);
+                }
+              }; 
+              // update state
+              console.log('update state 1');
+              setHand(workHand);
+              setHandPC(workHandPC);
+              setSide1(workSide1);
+              setSide2(workSide2);
+              setSide3(workSide3);
+              setSide4(workSide4);
+              setCorner1(workCorner1);
+              setCorner2(workCorner2);
+              setCorner3(workCorner3);
+              setCorner4(workCorner4);
+              setDeckId(data.deck_id);
+              setCardsRem(data.remaining);
+              setMessage('Draw card');
+              setEndOfGame(false); 
+            });
+          } else { 
           // update state
-          setHand(workHand);
-          setHandPC(workHandPC);
-          setSide1(workSide1);
-          setSide2(workSide2);
-          setSide3(workSide3);
-          setSide4(workSide4);
-          setCorner1(workCorner1);
-          setCorner2(workCorner2);
-          setCorner3(workCorner3);
-          setCorner4(workCorner4);
-          setDeckId(data.deck_id);
-          setCardsRem(data.remaining);
-          setMessage('Draw card');
-          setEndOfGame(false);
+            console.log('update state 2');
+            setHand(workHand);
+            setHandPC(workHandPC);
+            setSide1(workSide1);
+            setSide2(workSide2);
+            setSide3(workSide3);
+            setSide4(workSide4);
+            setCorner1(workCorner1);
+            setCorner2(workCorner2);
+            setCorner3(workCorner3);
+            setCorner4(workCorner4);
+            setDeckId(data.deck_id);
+            setCardsRem(data.remaining);
+            setMessage('Draw card');
+            setEndOfGame(false);  
+          };
         });
+
     }
   }, [useTestBed]);
 
   // useEffect - Get 18 cards from deck and place on playing board
   useEffect(() => {
     boardSetup();
-  }, [boardSetup]);
+  }, []);
 
   // Reset game
   const onReset = useCallback(() => {
