@@ -163,20 +163,18 @@ function App() {
       cardsMoved = checkForMovePile(source, target, 0, cardsMoved);
       if (cardsMoved) {
         moveCard(changedHandPC, source, 0);
-
-        // NEW: move to handle addition of card to empty pile  >>>>>>>>>>>>>>>>
-        // i = 0;
-        // let cardsMoved = false;
-        // for (i = 0; i < changedHandPC.length; i++) {
-        //   [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
-        //   if (changedHandPC.length === 0) break;
-        //   if (cardsMoved) {
-        //     i = -1;
-        //     cardsMoved = false;
-        //   }
-        // }
+        // NEW: move to handle addition of card to empty pile... and if it can be built on
+        let cardsMoved = false;
+        for (let i = 0; i < changedHandPC.length; i++) {
+          if (changedHandPC.length === 0) break;
+          [i, cardsMoved] = checkForMove(changedHandPC, source, i, cardsMoved);
+          if (cardsMoved) {
+            i = -1;
+            cardsMoved = false;
+          }
+        }
+        cardsMoved = true;
         // NEW END
-
         workMessage = endOfGameCheck(changedHandPC);
       }
     }
@@ -245,7 +243,8 @@ function App() {
   }, [deckId, cardsRem, useTestBed]);
 
   // drawCard - Get 'n' cards from deck and place on Side1-4 to replace any Kings
-  const drawMultiCard = useCallback((deckId, numCards) => {
+  const drawMultiCard = useCallback(
+    (deckId, numCards) => {
       let urlDrawHandMulti2 = urlDrawHandMulti.replace('<<deck_id>>', deckId).replace('numCards', numCards);
       if (useTestBed) {
         urlDrawHandMulti2 = urlDrawHandTest;
@@ -278,7 +277,7 @@ function App() {
                 code: data.cards[i].code,
               };
               kingCards.push(handEntry);
-            };
+            }
           }
           return kingCards;
         })
@@ -704,49 +703,49 @@ function App() {
           code: fullDeck[i].code,
         };
         if (fullDeck[i].code.indexOf('K') === -1) {
-            if (workSide1.length === 0) {
-              workSide1.push(handEntry);
-            } else if (workSide2.length === 0) {
-              workSide2.push(handEntry);
-            } else if (workSide3.length === 0) {
-              workSide3.push(handEntry);
-            } else if (workSide4.length === 0) {
-              workSide4.push(handEntry);
-            }
+          if (workSide1.length === 0) {
+            workSide1.push(handEntry);
+          } else if (workSide2.length === 0) {
+            workSide2.push(handEntry);
+          } else if (workSide3.length === 0) {
+            workSide3.push(handEntry);
+          } else if (workSide4.length === 0) {
+            workSide4.push(handEntry);
+          }
         } else {
-            numCards = numCards + 1;
-            if (workCorner1.length === 0) {
-              workCorner1.push(handEntry);
-            } else if (workCorner2.length === 0) {
-              workCorner2.push(handEntry);
-            } else if (workCorner3.length === 0) {
-              workCorner3.push(handEntry);
-            } else if (workCorner4.length === 0) {
-              workCorner4.push(handEntry);
-            }
+          numCards = numCards + 1;
+          if (workCorner1.length === 0) {
+            workCorner1.push(handEntry);
+          } else if (workCorner2.length === 0) {
+            workCorner2.push(handEntry);
+          } else if (workCorner3.length === 0) {
+            workCorner3.push(handEntry);
+          } else if (workCorner4.length === 0) {
+            workCorner4.push(handEntry);
+          }
         }
       }
       let workCardsRem = 34;
       if (numCards > 0) {
-          for (i = 0; i < numCards; i++) {
-            workCardsRem = workCardsRem - 1;
-            sortCard = calcSortCard(fullDeck[51 - workCardsRem].sortCard);
-            handEntry = {
-              cardImage: fullDeck[51 - workCardsRem].cardImage,
-              sortCard: sortCard,
-              code: fullDeck[51 - workCardsRem].code,
-            };
-            if (workSide4.length === 0) {
-              workSide4.push(handEntry);
-            } else if (workSide3.length === 0) {
-              workSide3.push(handEntry);
-            } else if (workSide2.length === 0) {
-              workSide2.push(handEntry);
-            } else if (workSide1.length === 0) {
-              workSide1.push(handEntry);
-            }
-          }; 
-      };
+        for (i = 0; i < numCards; i++) {
+          workCardsRem = workCardsRem - 1;
+          sortCard = calcSortCard(fullDeck[51 - workCardsRem].sortCard);
+          handEntry = {
+            cardImage: fullDeck[51 - workCardsRem].cardImage,
+            sortCard: sortCard,
+            code: fullDeck[51 - workCardsRem].code,
+          };
+          if (workSide4.length === 0) {
+            workSide4.push(handEntry);
+          } else if (workSide3.length === 0) {
+            workSide3.push(handEntry);
+          } else if (workSide2.length === 0) {
+            workSide2.push(handEntry);
+          } else if (workSide1.length === 0) {
+            workSide1.push(handEntry);
+          }
+        }
+      }
       // update state
       setCardsRem(workCardsRem);
       setHand(workHand);
@@ -843,7 +842,7 @@ function App() {
                 } else if (workSide1.length === 0) {
                   workSide1.push(kingCards[i]);
                 }
-              }; 
+              }
               // update state
               setHand(workHand);
               setHandPC(workHandPC);
@@ -858,10 +857,10 @@ function App() {
               setDeckId(data.deck_id);
               setCardsRem(data.remaining - numCards);
               setMessage('Draw card');
-              setEndOfGame(false); 
+              setEndOfGame(false);
             });
-          } else { 
-          // update state
+          } else {
+            // update state
             setHand(workHand);
             setHandPC(workHandPC);
             setSide1(workSide1);
@@ -875,10 +874,9 @@ function App() {
             setDeckId(data.deck_id);
             setCardsRem(data.remaining);
             setMessage('Draw card');
-            setEndOfGame(false);  
-          };
+            setEndOfGame(false);
+          }
         });
-
     }
   }, [useTestBed]);
 
