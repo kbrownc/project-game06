@@ -12,7 +12,7 @@ function App() {
   const urlDrawHandMulti = 'https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=numCards';
 
   // State
-  const [useTestBed, setUseTestBed] = useState(true);
+  const [useTestBed, setUseTestBed] = useState(false);
 
   const [cardsRem, setCardsRem] = useState(51);
   const [message, setMessage] = useState('Draw a card');
@@ -367,176 +367,176 @@ function App() {
       cardsMoved = false;
       while (true) {
         if (workMessage !== '') break;
-        console.log('-----Side2 Side1');
+        //console.log('-----Side2 Side1');
         [workMessage, cardsMoved] = movePile(changedSide2, changedSide1, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side3 Side1');
+        //console.log('-----Side3 Side1');
         [workMessage, cardsMoved] = movePile(changedSide3, changedSide1, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side4 Side1');
+        //console.log('-----Side4 Side1');
         [workMessage, cardsMoved] = movePile(changedSide4, changedSide1, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
-        console.log('-----Side1 Side2');
+        //console.log('-----Side1 Side2');
         [workMessage, cardsMoved] = movePile(changedSide1, changedSide2, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side3 Side2');
+        //console.log('-----Side3 Side2');
         [workMessage, cardsMoved] = movePile(changedSide3, changedSide2, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side4 Side2');
+        //console.log('-----Side4 Side2');
         [workMessage, cardsMoved] = movePile(changedSide4, changedSide2, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
-        console.log('-----Side1 Side3');
+        //console.log('-----Side1 Side3');
         [workMessage, cardsMoved] = movePile(changedSide1, changedSide3, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side2 Side3');
+        //console.log('-----Side2 Side3');
         [workMessage, cardsMoved] = movePile(changedSide2, changedSide3, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side4 Side3');
+        //console.log('-----Side4 Side3');
         [workMessage, cardsMoved] = movePile(changedSide4, changedSide3, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
-        console.log('-----Side1 Side4');
+        //console.log('-----Side1 Side4');
         [workMessage, cardsMoved] = movePile(changedSide1, changedSide4, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side2 Side4');
+        //console.log('-----Side2 Side4');
         [workMessage, cardsMoved] = movePile(changedSide2, changedSide4, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side3 Side4');
+        //console.log('-----Side3 Side4');
         [workMessage, cardsMoved] = movePile(changedSide3, changedSide4, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
-        console.log('-----Side1 Corner1');
+        //console.log('-----Side1 Corner1');
         [workMessage, cardsMoved] = movePile(changedSide1, changedCorner1, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side2 Corner1');
+        //console.log('-----Side2 Corner1');
         [workMessage, cardsMoved] = movePile(changedSide2, changedCorner1, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side3 Corner1');
+        //console.log('-----Side3 Corner1');
         [workMessage, cardsMoved] = movePile(changedSide3, changedCorner1, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side4 Corner1');
+        //console.log('-----Side4 Corner1');
         [workMessage, cardsMoved] = movePile(changedSide4, changedCorner1, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
-        console.log('-----Side1 Corner2');
+        //console.log('-----Side1 Corner2');
         [workMessage, cardsMoved] = movePile(changedSide1, changedCorner2, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side2 Corner2');
+        //console.log('-----Side2 Corner2');
         [workMessage, cardsMoved] = movePile(changedSide2, changedCorner2, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side3 Corner2');
+        //console.log('-----Side3 Corner2');
         [workMessage, cardsMoved] = movePile(changedSide3, changedCorner2, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side4 Corner2');
+        //console.log('-----Side4 Corner2');
         [workMessage, cardsMoved] = movePile(changedSide4, changedCorner2, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
-        console.log('-----Side1 Corner3');
+        //console.log('-----Side1 Corner3');
         [workMessage, cardsMoved] = movePile(changedSide1, changedCorner3, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side2 Corner3');
+        //console.log('-----Side2 Corner3');
         [workMessage, cardsMoved] = movePile(changedSide2, changedCorner3, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side3 Corner3');
+        //console.log('-----Side3 Corner3');
         [workMessage, cardsMoved] = movePile(changedSide3, changedCorner3, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side4 Corner3');
+        //console.log('-----Side4 Corner3');
         [workMessage, cardsMoved] = movePile(changedSide4, changedCorner3, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
-        console.log('-----Side1 Corner4');
+        //console.log('-----Side1 Corner4');
         [workMessage, cardsMoved] = movePile(changedSide1, changedCorner4, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side2 Corner4');
+        //console.log('-----Side2 Corner4');
         [workMessage, cardsMoved] = movePile(changedSide2, changedCorner4, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side3 Corner4');
+        //console.log('-----Side3 Corner4');
         [workMessage, cardsMoved] = movePile(changedSide3, changedCorner4, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
-        console.log('-----Side4 Corner4');
+        //console.log('-----Side4 Corner4');
         [workMessage, cardsMoved] = movePile(changedSide4, changedCorner4, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
@@ -559,7 +559,7 @@ function App() {
       setSide3(changedSide3);
       setSide4(changedSide4);
       setMessage(workMessage);
-      console.log('*** End of PC processing');
+      //console.log('*** End of PC processing');
     });
   }, [
     handPC,
@@ -580,7 +580,24 @@ function App() {
 
   // About the game
   const onAbout = useCallback(() => {
-    alert('How to play the game');
+    alert(`The object of the game is to be the first player to get rid of all the cards in your hand.` +
+        ` The game uses a standard 52-card deck of playing cards. Cards rank from King highest to Ace lowest.` +
+        `This game matches you up against a computer.` +
+        `The game deals out a hand of 7 cards to each of you and the computer. It then places 1 card to start` + 
+        ` each of the 4 ‘side’ piles. If one of these is a King, it moves the King to a ‘corner’ pile and deals` + 
+        ` a new card to the side pile.` +
+        `A player starts their turn by drawing 1 card by pressing the ‘draw card’ button.` +
+        ` A player may play a card(s) from their hand onto the existing ‘side’ or ‘corner’ piles.` +
+        `The card played must be the next lower in rank to the card on top of the pile, and it also must be the ` +
+        `opposite color. ‘Corner’ piles can only start with a King.` +
+        ` A player may move an entire side pile if the bottom card of that pile is the opposite color and one` + 
+        `rank lower than a card on top of another pile. If one of the original four ‘side’ piles becomes empty` + 
+        ` (because the cards in it were moved onto another pile), a player may play any card from their hand ` +
+        `to the empty space, thus re-starting the side pile. When a player has completed all of the moves they` + 
+        ` have available, they will press the ‘Turn Complete’ button to trigger the computers turn. ` +
+        `When this is complete (less than 1 sec), it’s the players turn again. ` +
+        `A message will show when a player has won (as well as the draw card and turn complete buttons disappearing).` +
+        ` The ‘reset’ button discards the current game and deals out the start of a new game.`);
   }, []);
 
   // Expand card pile
