@@ -187,7 +187,6 @@ function App() {
     if (hand.length === 0) {
       workMessage = 'end of game';
       setEndOfGame(true);
-      console.error('end of game');
     }
     return workMessage;
   };
@@ -367,7 +366,7 @@ function App() {
       cardsMoved = false;
       while (true) {
         if (workMessage !== '') break;
-        //console.log('-----Side2 Side1');
+        //console.log;('-----Side2 Side1');
         [workMessage, cardsMoved] = movePile(changedSide2, changedSide1, changedHandPC, cardsMoved);
         if (cardsMoved) {
           cardsMoved = false;
