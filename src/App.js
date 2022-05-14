@@ -1011,6 +1011,9 @@ function App() {
     }
     // Check for end of game for player
     let workMessage = endOfGameCheck(changedHand);
+    if (workMessage === '') {
+        workMessage = 'Move a Card';
+    };
 
     // update state
     setHandPC(changedHandPC);
