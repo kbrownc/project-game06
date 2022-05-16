@@ -17,8 +17,8 @@
 }
 .Nav {
   display: grid;
-  grid-template-columns: repeat(4, 95px);
-  grid-template-rows: repeat(1, 20px);
+  grid-template-columns: repeat(4, 92px);
+  grid-template-rows: repeat(1, 18px);
   justify-content: center;
   align-items: center;
   margin-bottom: 1px;
@@ -26,8 +26,8 @@
 .Messages {
   text-align: center;
   justify-content: center;
-  height: 30px;
-  width: 280px;
+  height: 18px;
+  width: 274px;
   margin: auto;
   border: 1px solid black;
 }
