@@ -1049,7 +1049,9 @@ function App() {
           </div>
           <div className="Box Button" onClick={onAbout}>
             About
-          </div>
+          </div> 
+        </div>
+        <div className="Nav-expand">
           <div className="Box2">Cards Left: {cardsRem}</div>
           <div className="Messages">{message}</div>
         </div>

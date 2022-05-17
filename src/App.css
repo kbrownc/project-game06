@@ -30,6 +30,8 @@
   width: 274px;
   margin: auto;
   border: 1px solid black;
+  align-items: center;
+  float: right;
 }
 h4 {
   margin: 6px;
@@ -47,10 +49,13 @@ h4 {
   background-color: lightgreen;
   visibility: visible;
   border: 1px solid black;
+  justify-content: center;
   max-width: 95px;
   max-height: 20px;
   font-size: 12px;
   font-weight: bold;
+  align-items: center;
+  float:left;
 }
 .Invisible {
   visibility: hidden;
