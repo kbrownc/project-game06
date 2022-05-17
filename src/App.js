@@ -1050,9 +1050,10 @@ function App() {
           <div className="Box Button" onClick={onAbout}>
             About
           </div>
-          <div className="Box2">Cards Left: {cardsRem}</div>
-          <div className="Messages">{message}</div>
+          
         </div>
+        <div className="Box2">Cards Left: {cardsRem}</div>
+          <div className="Messages">{message}</div>
         <div className="Nav-expand">
           <div
             className="Box-expand Button"
