@@ -15,6 +15,11 @@
   margin-bottom: 5px;
   justify-content: space-around;
 }
+.Nav-message {
+  display: flex;
+  margin-bottom: 1px;
+  justify-content: center;
+}
 .Nav {
   display: grid;
   grid-template-columns: repeat(4, 92px);
@@ -24,14 +29,13 @@
   margin-bottom: 1px;
 }
 .Messages {
-  text-align: center;
-  justify-content: center;
-  height: 18px;
+  background-color: lightgreen;
+  max-height: 18px;
   width: 274px;
-  margin: auto;
   border: 1px solid black;
+  font-weight: bold;
   align-items: center;
-  float: right;
+  justify-content: center;
 }
 h4 {
   margin: 6px;
@@ -47,7 +51,6 @@ h4 {
 }
 .Box2 {
   background-color: lightgreen;
-  visibility: visible;
   border: 1px solid black;
   justify-content: center;
   max-width: 95px;
@@ -55,7 +58,6 @@ h4 {
   font-size: 12px;
   font-weight: bold;
   align-items: center;
-  float:left;
 }
 .Invisible {
   visibility: hidden;

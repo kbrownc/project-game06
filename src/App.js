@@ -1051,7 +1051,7 @@ function App() {
             About
           </div> 
         </div>
-        <div className="Nav-expand">
+        <div className="Nav-message">
           <div className="Box2">Cards Left: {cardsRem}</div>
           <div className="Messages">{message}</div>
         </div>
