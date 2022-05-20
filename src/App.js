@@ -1679,37 +1679,9 @@ function App() {
           )}
         </Droppable>
 
-        <Droppable droppableId="HANDPC" direction="horizontal">
-          {provided => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              <div className="Hand">
-                <div>
-                  <span>Computer Hand</span>
-                  <br></br>
-                  {handPC.map((item, index) => (
-                    <Draggable draggableId={item.code} index={index} key={item.code}>
-                      {provided => (
-                        <img
-                          className="img-card"
-                          src={item.cardImage}
-                          alt=""
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                          {...provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              </div>
-            </div>
-          )}
-        </Droppable>
-
         <div className="Hand">
           <div>
-            Computer's Cards Played this round:
+            Computer's Hand: No. of cards = {handPC.length}    Cards Played this round:
             {handPCround.map((item, index) => ` ${item.code}`)}
           </div>
         </div>
