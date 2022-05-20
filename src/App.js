@@ -29,6 +29,7 @@ function App() {
   const [deckId, setDeckId] = useState('');
   const [hand, setHand] = useState();
   const [handPC, setHandPC] = useState();
+  const [handPCround, setHandPCround] = useState([]);
   const [expand1, setExpand1] = useState('Expand');
   const [expand2, setExpand2] = useState('Expand');
   const [expand3, setExpand3] = useState('Expand');
@@ -93,26 +94,18 @@ function App() {
     }
   }, [deckId, hand, cardsRem, useTestBed]);
 
-  // Move a card (includes a dynamic function)
-  // const moveCard = (source, target, sourceIndex) => {
-  //   const move = function (source, target, sourceIndex) {
-  //     let add = source.slice(sourceIndex, sourceIndex + 1);
-  //     source.splice(sourceIndex, 1);
-  //     target.splice(target.length, 0, ...add);
-  //   };
-  //   move(source, target, sourceIndex);
-  // };
-
   // Move a card
-  const moveCard = (source, target, sourceIndex) => {
+  const moveCard = (source, target, sourceIndex, changedHandPCround) => {
     let add = source.slice(sourceIndex, sourceIndex + 1);
     source.splice(sourceIndex, 1);
     target.splice(target.length, 0, ...add);
+    changedHandPCround.splice(changedHandPCround.length, 0, ...add);
+    //console.log({...add},{...changedHandPCround});
     //console.log('moveCard', { ...add }, { ...target });
   };
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
-  const checkForMove = (source, target, sourceIndex, cardsMoved) => {
+  const checkForMove = (source, target, sourceIndex, cardsMoved, changedHandPCround) => {
     let index = sourceIndex;
     if (source.length === 0) return;
     let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
@@ -126,7 +119,7 @@ function App() {
       source[sourceIndex].sortCard + 1 === target[target.length - 1].sortCard &&
       sourceBlack !== targetBlack
     ) {
-      moveCard(source, target, sourceIndex);
+      moveCard(source, target, sourceIndex, changedHandPCround);
       cardsMoved = true;
       if (sourceIndex > 0) {
         index = sourceIndex - 1;
@@ -136,7 +129,7 @@ function App() {
   };
 
   // Figure out if a card can be moved (to a card 1 lower and opposite color)
-  const checkForMovePile = (source, target, sourceIndex, cardsMoved) => {
+  const checkForMovePile = (source, target, sourceIndex, cardsMoved, changedHandPCround) => {
     let sourceBlack = source[sourceIndex].code.includes('C') || source[sourceIndex].code.includes('S');
     let targetBlack =
       target[target.length - 1].code.includes('C') || target[target.length - 1].code.includes('S');
@@ -146,7 +139,7 @@ function App() {
     ) {
       let i = 0;
       for (i = 0; i < source.length; i++) {
-        moveCard(source, target, i);
+        moveCard(source, target, i, changedHandPCround);
         i = i - 1;
       }
       cardsMoved = true;
@@ -157,17 +150,17 @@ function App() {
   };
 
   // move a pile
-  const movePile = (source, target, changedHandPC, cardsMoved) => {
+  const movePile = (source, target, changedHandPC, cardsMoved, changedHandPCround) => {
     let workMessage = '';
     if (target.length > 0 && source.length > 0) {
-      cardsMoved = checkForMovePile(source, target, 0, cardsMoved);
+      cardsMoved = checkForMovePile(source, target, 0, cardsMoved, changedHandPCround);
       if (cardsMoved) {
-        moveCard(changedHandPC, source, 0);
+        moveCard(changedHandPC, source, 0, changedHandPCround);
         // NEW: move to handle addition of card to empty pile... and if it can be built on
         let cardsMoved = false;
         for (let i = 0; i < changedHandPC.length; i++) {
           if (changedHandPC.length === 0) break;
-          [i, cardsMoved] = checkForMove(changedHandPC, source, i, cardsMoved);
+          [i, cardsMoved] = checkForMove(changedHandPC, source, i, cardsMoved, changedHandPCround);
           if (cardsMoved) {
             i = -1;
             cardsMoved = false;
@@ -293,6 +286,7 @@ function App() {
   //
   const onTurnDone = useCallback(() => {
     let changedHandPC = JSON.parse(JSON.stringify(handPC));
+    let changedHandPCround = [];
     let changedCorner1 = JSON.parse(JSON.stringify(corner1));
     let changedCorner2 = JSON.parse(JSON.stringify(corner2));
     let changedCorner3 = JSON.parse(JSON.stringify(corner3));
@@ -313,11 +307,11 @@ function App() {
         kingPresent = changedHandPC[i].code.indexOf('K');
         if (kingPresent !== -1) {
           if (changedCorner1.length === 0) {
-            moveCard(changedHandPC, changedCorner1, i);
+            moveCard(changedHandPC, changedCorner1, i, changedHandPCround);
           } else if (changedCorner2.length === 0) {
-            moveCard(changedHandPC, changedCorner2, i);
+            moveCard(changedHandPC, changedCorner2, i, changedHandPCround);
           } else if (changedCorner3.length === 0) {
-            moveCard(changedHandPC, changedCorner3, i);
+            moveCard(changedHandPC, changedCorner3, i, changedHandPCround);
           } else {
             moveCard(changedHandPC, changedCorner4, i);
           }
@@ -332,14 +326,14 @@ function App() {
       let cardsMoved = false;
       for (i = 0; i < changedHandPC.length; i++) {
         // find out if card is 1 less and color of cards are different
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide1, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide3, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedSide4, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner1, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner2, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner3, i, cardsMoved);
-        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner4, i, cardsMoved);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide1, i, cardsMoved, changedHandPCround);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide2, i, cardsMoved, changedHandPCround);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide3, i, cardsMoved, changedHandPCround);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedSide4, i, cardsMoved, changedHandPCround);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner1, i, cardsMoved, changedHandPCround);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner2, i, cardsMoved, changedHandPCround);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner3, i, cardsMoved, changedHandPCround);
+        [i, cardsMoved] = checkForMove(changedHandPC, changedCorner4, i, cardsMoved, changedHandPCround);
         // if a card was moved, start main loop over
         if (changedHandPC.length > 0 && cardsMoved) {
           i = -1;
@@ -367,176 +361,176 @@ function App() {
       while (true) {
         if (workMessage !== '') break;
         //console.log;('-----Side2 Side1');
-        [workMessage, cardsMoved] = movePile(changedSide2, changedSide1, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide2, changedSide1, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side3 Side1');
-        [workMessage, cardsMoved] = movePile(changedSide3, changedSide1, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide3, changedSide1, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side4 Side1');
-        [workMessage, cardsMoved] = movePile(changedSide4, changedSide1, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide4, changedSide1, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
         //console.log('-----Side1 Side2');
-        [workMessage, cardsMoved] = movePile(changedSide1, changedSide2, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide1, changedSide2, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side3 Side2');
-        [workMessage, cardsMoved] = movePile(changedSide3, changedSide2, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide3, changedSide2, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side4 Side2');
-        [workMessage, cardsMoved] = movePile(changedSide4, changedSide2, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide4, changedSide2, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
         //console.log('-----Side1 Side3');
-        [workMessage, cardsMoved] = movePile(changedSide1, changedSide3, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide1, changedSide3, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side2 Side3');
-        [workMessage, cardsMoved] = movePile(changedSide2, changedSide3, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide2, changedSide3, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side4 Side3');
-        [workMessage, cardsMoved] = movePile(changedSide4, changedSide3, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide4, changedSide3, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
         //console.log('-----Side1 Side4');
-        [workMessage, cardsMoved] = movePile(changedSide1, changedSide4, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide1, changedSide4, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side2 Side4');
-        [workMessage, cardsMoved] = movePile(changedSide2, changedSide4, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide2, changedSide4, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side3 Side4');
-        [workMessage, cardsMoved] = movePile(changedSide3, changedSide4, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide3, changedSide4, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
         //console.log('-----Side1 Corner1');
-        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner1, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner1, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side2 Corner1');
-        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner1, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner1, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side3 Corner1');
-        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner1, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner1, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side4 Corner1');
-        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner1, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner1, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
         //console.log('-----Side1 Corner2');
-        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner2, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner2, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side2 Corner2');
-        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner2, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner2, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side3 Corner2');
-        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner2, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner2, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side4 Corner2');
-        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner2, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner2, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
         //console.log('-----Side1 Corner3');
-        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner3, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner3, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side2 Corner3');
-        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner3, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner3, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side3 Corner3');
-        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner3, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner3, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side4 Corner3');
-        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner3, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner3, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
 
         //console.log('-----Side1 Corner4');
-        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner4, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide1, changedCorner4, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side2 Corner4');
-        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner4, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide2, changedCorner4, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side3 Corner4');
-        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner4, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide3, changedCorner4, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
         }
         //console.log('-----Side4 Corner4');
-        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner4, changedHandPC, cardsMoved);
+        [workMessage, cardsMoved] = movePile(changedSide4, changedCorner4, changedHandPC, cardsMoved, changedHandPCround);
         if (cardsMoved) {
           cardsMoved = false;
           continue;
@@ -549,6 +543,7 @@ function App() {
       }
 
       setHandPC(changedHandPC);
+      setHandPCround(changedHandPCround);
       setCorner1(changedCorner1);
       setCorner2(changedCorner2);
       setCorner3(changedCorner3);
@@ -562,6 +557,7 @@ function App() {
     });
   }, [
     handPC,
+    handPCround,
     drawCard,
     moveCard,
     corner1,
@@ -677,7 +673,8 @@ function App() {
     if (useTestBed) {
       console.log('*** Test Bed in use ***');
       let workHand = [],
-        workHandPC = [];
+        workHandPC = [],
+        workHandPCround = [];
       let workSide1 = [],
         workSide2 = [],
         workSide3 = [],
@@ -766,6 +763,7 @@ function App() {
       setCardsRem(workCardsRem);
       setHand(workHand);
       setHandPC(workHandPC);
+      setHandPCround(workHandPCround);
       setSide1(workSide1);
       setSide2(workSide2);
       setSide3(workSide3);
@@ -782,7 +780,8 @@ function App() {
         .then(response => response.json())
         .then(data => {
           let workHand = [],
-            workHandPC = [];
+            workHandPC = [],
+            workHandPCround = [];
           let workSide1 = [],
             workSide2 = [],
             workSide3 = [],
@@ -862,6 +861,7 @@ function App() {
               // update state
               setHand(workHand);
               setHandPC(workHandPC);
+              setHandPCround(workHandPCround);
               setSide1(workSide1);
               setSide2(workSide2);
               setSide3(workSide3);
@@ -879,6 +879,7 @@ function App() {
             // update state
             setHand(workHand);
             setHandPC(workHandPC);
+            setHandPCround(workHandPCround);
             setSide1(workSide1);
             setSide2(workSide2);
             setSide3(workSide3);
@@ -1535,6 +1536,14 @@ function App() {
             </div>
           )}
         </Droppable>
+  
+        <div className="Hand">
+          <div>
+            Computer's Cards Played this round:
+            {handPCround.map((item, index) => (item.code))}
+          </div>
+        </div>    
+
       </DragDropContext>
     </div>
   );
