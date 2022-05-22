@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  margin: 10px;
+  margin: 20px;
   text-align: center;
 }
 .Title {
@@ -35,6 +35,7 @@
   border: 1px solid black;
   font-weight: bold;
   align-items: center;
+  font-size: 12px;
   justify-content: center;
 }
 h4 {
