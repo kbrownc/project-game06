@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import './App.css';
-//import { fullDeck } from './fullDeck';
-import { fullDeck } from './fullDeck2';
+import { fullDeck } from './fullDeck';
+//import { fullDeck } from './fullDeck2';
 
 function App() {
   // url variables
@@ -360,7 +360,6 @@ function App() {
       cardsMoved = false;
       while (true) {
         if (workMessage !== '') break;
-        //console.log;('-----Side2 Side1');
         [workMessage, cardsMoved] = movePile(
           changedSide2,
           changedSide1,
@@ -372,7 +371,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side3 Side1');
         [workMessage, cardsMoved] = movePile(
           changedSide3,
           changedSide1,
@@ -384,7 +382,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side4 Side1');
         [workMessage, cardsMoved] = movePile(
           changedSide4,
           changedSide1,
@@ -396,8 +393,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-
-        //console.log('-----Side1 Side2');
         [workMessage, cardsMoved] = movePile(
           changedSide1,
           changedSide2,
@@ -409,7 +404,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side3 Side2');
         [workMessage, cardsMoved] = movePile(
           changedSide3,
           changedSide2,
@@ -421,7 +415,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side4 Side2');
         [workMessage, cardsMoved] = movePile(
           changedSide4,
           changedSide2,
@@ -433,8 +426,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-
-        //console.log('-----Side1 Side3');
         [workMessage, cardsMoved] = movePile(
           changedSide1,
           changedSide3,
@@ -446,7 +437,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side2 Side3');
         [workMessage, cardsMoved] = movePile(
           changedSide2,
           changedSide3,
@@ -458,7 +448,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side4 Side3');
         [workMessage, cardsMoved] = movePile(
           changedSide4,
           changedSide3,
@@ -470,8 +459,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-
-        //console.log('-----Side1 Side4');
         [workMessage, cardsMoved] = movePile(
           changedSide1,
           changedSide4,
@@ -483,7 +470,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side2 Side4');
         [workMessage, cardsMoved] = movePile(
           changedSide2,
           changedSide4,
@@ -495,7 +481,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side3 Side4');
         [workMessage, cardsMoved] = movePile(
           changedSide3,
           changedSide4,
@@ -507,8 +492,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-
-        //console.log('-----Side1 Corner1');
         [workMessage, cardsMoved] = movePile(
           changedSide1,
           changedCorner1,
@@ -520,7 +503,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side2 Corner1');
         [workMessage, cardsMoved] = movePile(
           changedSide2,
           changedCorner1,
@@ -532,7 +514,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side3 Corner1');
         [workMessage, cardsMoved] = movePile(
           changedSide3,
           changedCorner1,
@@ -544,7 +525,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side4 Corner1');
         [workMessage, cardsMoved] = movePile(
           changedSide4,
           changedCorner1,
@@ -556,8 +536,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-
-        //console.log('-----Side1 Corner2');
         [workMessage, cardsMoved] = movePile(
           changedSide1,
           changedCorner2,
@@ -569,7 +547,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side2 Corner2');
         [workMessage, cardsMoved] = movePile(
           changedSide2,
           changedCorner2,
@@ -581,7 +558,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side3 Corner2');
         [workMessage, cardsMoved] = movePile(
           changedSide3,
           changedCorner2,
@@ -593,7 +569,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side4 Corner2');
         [workMessage, cardsMoved] = movePile(
           changedSide4,
           changedCorner2,
@@ -605,8 +580,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-
-        //console.log('-----Side1 Corner3');
         [workMessage, cardsMoved] = movePile(
           changedSide1,
           changedCorner3,
@@ -618,7 +591,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side2 Corner3');
         [workMessage, cardsMoved] = movePile(
           changedSide2,
           changedCorner3,
@@ -630,7 +602,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side3 Corner3');
         [workMessage, cardsMoved] = movePile(
           changedSide3,
           changedCorner3,
@@ -642,7 +613,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side4 Corner3');
         [workMessage, cardsMoved] = movePile(
           changedSide4,
           changedCorner3,
@@ -654,8 +624,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-
-        //console.log('-----Side1 Corner4');
         [workMessage, cardsMoved] = movePile(
           changedSide1,
           changedCorner4,
@@ -667,7 +635,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side2 Corner4');
         [workMessage, cardsMoved] = movePile(
           changedSide2,
           changedCorner4,
@@ -679,7 +646,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side3 Corner4');
         [workMessage, cardsMoved] = movePile(
           changedSide3,
           changedCorner4,
@@ -691,7 +657,6 @@ function App() {
           cardsMoved = false;
           continue;
         }
-        //console.log('-----Side4 Corner4');
         [workMessage, cardsMoved] = movePile(
           changedSide4,
           changedCorner4,
@@ -1681,7 +1646,7 @@ function App() {
 
         <div className="Hand">
           <div>
-            Computer's Hand: No. of cards = {handPC.length}    Cards Played this round:
+            Computer's Hand: No. of cards = {handPC.length} Cards Played this round:
             {handPCround.map((item, index) => ` ${item.code}`)}
           </div>
         </div>
