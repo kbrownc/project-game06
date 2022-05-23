@@ -743,7 +743,7 @@ function App() {
 
   // About the game
   const onAbout = useCallback(() => {
-    alert(
+    window.confirm(
       `The object of the game is to be the first player to get rid of all the cards in your hand.` +
         ` The game uses a standard 52-card deck of playing cards. Cards rank from King highest to Ace lowest.` +
         `This game matches you up against a computer.` +
